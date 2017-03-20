@@ -10,7 +10,7 @@ import br.ufla.naivetorrent.domain.peer.Peer;
  * @author carlos
  *
  */
-public class TrackerResponseMessage implements Serializable {
+public class ResponseMessage implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	/**
@@ -37,6 +37,17 @@ public class TrackerResponseMessage implements Serializable {
 	 * Lista de peers
 	 */
 	private List<Peer> peers;
+	
+	
+	/**
+	 * Verifica se a mensagem de resposta é válida.
+	 * @return true se a mensagem de resposta é válida, caso contrário false.
+	 */
+	public boolean isValid() {
+		return interval != null && trackerId != null && complete != null 
+				&& incomplete != null && peers != null;
+	}
+	
 	public Integer getInterval() {
 		return interval;
 	}
