@@ -5,9 +5,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -62,23 +60,6 @@ public class ReadTorrent {
 	}
 	
 	/**
-	 * Decodifica a lista de chaves hash dos pedaços do arquivo.
-	 * @param metaInfo decodificação dos metadados de informação
-	 * @return lista de chaves hash dos pedaços do arquivo
-	 */
-	private List<ByteBuffer> decodeHashKeys(Map<Object, Object> metaInfo) {
-		List<ByteBuffer> hashPieces = new ArrayList<>();
-		byte hashPiecesBytes[] = ((String) metaInfo
-				.get(InfoMetaTorrent.Attributes.PIECES)).getBytes();
-		int length = hashPiecesBytes.length;
-		for (int i = 0; i < length; i += 20) {
-			hashPieces.add(ByteBuffer.wrap(Arrays
-					.copyOfRange(hashPiecesBytes, i, i + 20)));
-		}
-		return hashPieces;
-	}
-	
-	/**
 	 * Decodifica a lista de metadados dos arquivos compartilhados.
 	 * @param metaInfo decodificação dos metadados de informação
 	 * @return lista de metadados dos arquivos compartilhados
@@ -111,7 +92,8 @@ public class ReadTorrent {
 		InfoMetaTorrent infoMetaTor = metaTorrent.getInfo();
 		infoMetaTor.setPiecesLength(((Long) metaInfo
 				.get(InfoMetaTorrent.Attributes.PIECE_LENGTH)).intValue());
-		infoMetaTor.setPiecesHash(decodeHashKeys(metaInfo));
+		infoMetaTor.setPiecesHashString((String) 
+				metaInfo.get(InfoMetaTorrent.Attributes.PIECES));
 		infoMetaTor.setMetaFiles(decodeMetaFiles(metaInfo));
 	}
 	
