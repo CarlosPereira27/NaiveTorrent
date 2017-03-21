@@ -12,5 +12,6 @@ public class ResponseAttributes {
 	public static final String PEER_ID = "peer id";
 	public static final String PEER_IP = "peer ip";
 	public static final String PEER_PORT = "peer port";
+	public static final String CLIENT_ID = "client id";
 
 }

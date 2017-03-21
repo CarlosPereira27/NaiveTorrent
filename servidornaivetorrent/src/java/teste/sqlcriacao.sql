@@ -80,13 +80,6 @@ ALTER TABLE `client`
   ADD UNIQUE KEY `info_hash_id` (`info_hash_id`);
 
 --
--- Índices de tabela `client_torrent`
---
-ALTER TABLE `client_torrent`
-  ADD KEY `id_client` (`id_client`),
-  ADD KEY `id_torrent` (`id_torrent`);
-
---
 -- Índices de tabela `torrent`
 --
 ALTER TABLE `torrent`
@@ -111,17 +104,24 @@ ALTER TABLE `torrent`
 -- Restrições para dumps de tabelas
 --
 
---
--- Restrições para tabelas `client`
---
-ALTER TABLE `client`
-  ADD CONSTRAINT `client_ibfk_1` FOREIGN KEY (`id`) REFERENCES `client_torrent` (`id_client`) ON DELETE CASCADE;
 
 --
 -- Restrições para tabelas `client_torrent`
 --
 ALTER TABLE `client_torrent`
   ADD CONSTRAINT `client_torrent_ibfk_1` FOREIGN KEY (`id_torrent`) REFERENCES `torrent` (`id`) ON DELETE CASCADE;
+
+--
+-- Restrições para tabelas `client_torrent`
+--
+ALTER TABLE `client_torrent`
+  ADD CONSTRAINT `client_torrent_ibfk_2` FOREIGN KEY (`id_client`) REFERENCES `client` (`id`) ON DELETE CASCADE;
+
+--
+-- Índices de tabela `client_torrent`
+--
+ALTER TABLE `client_torrent`
+  ADD PRIMARY KEY (`id_client`, `id_torrent`);
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
 /*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
