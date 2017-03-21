@@ -1,5 +1,6 @@
 package br.ufla.naivetorrent.tracker.protocol;
 
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -62,10 +63,9 @@ public class ResponseMessageDecoder {
 			Peer peer = new Peer();
 			peer.setIdHex((String) peerDic.get(
 					ResponseAttributes.PEER_ID));
-			peer.setIp((String) peerDic.get(
-					ResponseAttributes.PEER_IP));
-			peer.setPort((Integer) peerDic.get(
-					ResponseAttributes.PEER_PORT));
+			String peerIp = (String) peerDic.get(ResponseAttributes.PEER_IP);
+			Integer peerPort = (Integer) peerDic.get(ResponseAttributes.PEER_PORT);
+			peer.setSocketAddressListening(new InetSocketAddress(peerIp, peerPort));
 			peers.add(peer);
 		}
 		return peers;

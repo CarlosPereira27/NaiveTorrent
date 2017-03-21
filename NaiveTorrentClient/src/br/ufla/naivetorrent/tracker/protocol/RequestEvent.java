@@ -9,7 +9,7 @@ import java.io.Serializable;
  * STOPPED - a comunicação está sendo interrompida pelo cliente
  * COMPLETED - o cliente completou de baixar o arquivo, tornou-se um seeder
  * STOPPED_FILE - o cliente está interrompendo a comunicação para um determinado arquivo
- * STARTED_FILE - o cliente está inidicando a comunicação para  um determinado arquivo.
+ * STARTED_FILE - o cliente está inicicando a comunicação para  um determinado arquivo.
  * @author carlos
  *
  */
@@ -26,7 +26,7 @@ public enum RequestEvent implements Serializable {
 	 * @param ordinal número que representa a instância.
 	 * @return instância do evento
 	 */
-	public RequestEvent getInstance(int ordinal) {
+	public static RequestEvent getInstance(int ordinal) {
 		switch (ordinal) {
 		case 0:
 			return STARTED;

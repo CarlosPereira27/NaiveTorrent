@@ -1,6 +1,7 @@
 package br.ufla.naivetorrent.domain.tracker;
 
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 
 import br.ufla.naivetorrent.util.UtilHex;
@@ -9,8 +10,7 @@ public class Tracker implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private ByteBuffer id;
-	private String name;
-	private Integer port;
+	private InetSocketAddress socketAddressListening;
 	
 	public ByteBuffer getId() {
 		return id;
@@ -24,17 +24,12 @@ public class Tracker implements Serializable {
 	public void setIdHex(String idHex) {
 		this.id = UtilHex.toBytes(idHex);
 	}
-	public String getName() {
-		return name;
+	public InetSocketAddress getSocketAddressListening() {
+		return socketAddressListening;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setSocketAddressListening(InetSocketAddress socketAddressListening) {
+		this.socketAddressListening = socketAddressListening;
 	}
-	public Integer getPort() {
-		return port;
-	}
-	public void setPort(Integer port) {
-		this.port = port;
-	}
+	
 
 }

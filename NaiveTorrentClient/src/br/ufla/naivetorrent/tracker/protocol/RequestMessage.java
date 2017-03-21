@@ -52,6 +52,15 @@ public class RequestMessage implements Serializable {
 	 */
 	private String trackerId;
 	
+	/**
+	 * Verifica se a mensagem da requisição é válida.
+	 * @return true se a mensagem da requisição é válida, caso contrário false.
+	 */
+	public boolean isValid() {
+		return infoHash != null && peerId != null && port != null
+				&& uploaded != null && downloaded != null
+				&& left != null;
+	}
 	
 	// MÉTODOS ACESSORES
 	public String getInfoHash() {

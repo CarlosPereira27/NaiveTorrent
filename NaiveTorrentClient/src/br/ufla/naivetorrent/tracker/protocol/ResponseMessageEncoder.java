@@ -44,8 +44,10 @@ public class ResponseMessageEncoder {
 		for (Peer peer : peers) {
 			Map<String, Object> peerDic = new LinkedHashMap<>();
 			peerDic.put(ResponseAttributes.PEER_ID, peer.getIdHex());
-			peerDic.put(ResponseAttributes.PEER_IP, peer.getIp());
-			peerDic.put(ResponseAttributes.PEER_PORT, peer.getPort());
+			peerDic.put(ResponseAttributes.PEER_IP, 
+					peer.getSocketAddressListening().getHostName());
+			peerDic.put(ResponseAttributes.PEER_PORT, 
+					peer.getSocketAddressListening().getPort());
 			peersListDic.add(peerDic);
 		}
 		return peersListDic;
