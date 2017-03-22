@@ -28,7 +28,7 @@ import javax.servlet.http.HttpServletResponse;
  * @author lfps
  */
 @WebServlet(name = "tracker", urlPatterns = {"/tracker"})
-public class Trackerservelet extends HttpServlet {
+public class Trackerservlet extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -143,7 +143,7 @@ public class Trackerservelet extends HttpServlet {
                 //encoding resposta
                 ResponseMessageEncoder encoder = new ResponseMessageEncoder(dao.Updated(trackerrequisicao));
 
-                out.print(encoder.getMessageEncode());
+                out.print(encoder.getMessageEncode()+"\n"+"sem parametro");
                 out.close();
                 dao.fecharConexao();
             
@@ -166,9 +166,9 @@ public class Trackerservelet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(Trackerservelet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Trackerservlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyVetoException ex) {
-            Logger.getLogger(Trackerservelet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Trackerservlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -186,9 +186,9 @@ public class Trackerservelet extends HttpServlet {
         try {
             processRequest(request, response);
         } catch (SQLException ex) {
-            Logger.getLogger(Trackerservelet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Trackerservlet.class.getName()).log(Level.SEVERE, null, ex);
         } catch (PropertyVetoException ex) {
-            Logger.getLogger(Trackerservelet.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Trackerservlet.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 

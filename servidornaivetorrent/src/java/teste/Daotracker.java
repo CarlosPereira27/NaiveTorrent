@@ -46,7 +46,7 @@ public class Daotracker {
 
         int idclient;
 
-        idtorrent = buscarIdClient(mensagem.getInfoHash());
+        idtorrent = buscarIdTorrent(mensagem.getInfoHash());
 
         idclient = buscarIdClient(mensagem.getPeerId());
 
@@ -192,6 +192,8 @@ public class Daotracker {
             getSeedersAndLenchers(mensagem.getInfoHash());
 
             resposta.setPeers(listaPeer(mensagem.getInfoHash()));
+            
+            System.out.println("entrou 1"+"\n");
 
         } // cliente não existe mais arquivo existe
         else if (idclient == -1 && idtorrent != -1) {
@@ -203,6 +205,8 @@ public class Daotracker {
             getSeedersAndLenchers(mensagem.getInfoHash());
 
             resposta.setPeers(listaPeer(mensagem.getInfoHash()));
+            
+             System.out.println("entrou 2"+"\n");
 
         } // cliente existe e arquivo também
         else if (idclient != -1 && idtorrent != -1) {
@@ -218,6 +222,10 @@ public class Daotracker {
             resposta.setPeers(listaPeer(mensagem.getInfoHash()));
 
             resposta.setClientId(mensagem.getPeerId());
+            
+            System.out.println(resposta.getClientId()+"\n");
+            
+             System.out.println("entrou 3"+"\n");
 
         } //cliente  existe e arquivo não existe
         else if (idclient != -1 && idtorrent == -1) {
@@ -236,6 +244,8 @@ public class Daotracker {
             resposta.setClientId(mensagem.getPeerId());
 
             getSeedersAndLenchers(mensagem.getInfoHash());
+            
+             System.out.println("entrou 4"+"\n");
 
         }
 
