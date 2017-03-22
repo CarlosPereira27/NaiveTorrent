@@ -102,7 +102,7 @@ public class ExtractMetaInfo {
 				metaTorrent.getInfo().addPieceHash(ByteBuffer
 						.wrap(messageDigestSHA1.digest(lastPiece)));
 				
-			}
+			}//FALTA EXTRAIR ÚLTIMO PEDACO
 			metaFileTorrent.setMd5sum(ByteBuffer.wrap(messageDigestMD5.digest()));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();

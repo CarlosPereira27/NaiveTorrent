@@ -43,8 +43,8 @@ public class TestHttpRequest {
 			while ((inputLine = in.readLine()) != null) {
 				sbResponse.append(inputLine);
 			}
-			System.out.println("######");
-			System.out.println(sbResponse.toString());
+			//System.out.println("######");
+			//System.out.println(sbResponse.toString());
 			in.close();
 		} else {
 			
@@ -64,19 +64,21 @@ public class TestHttpRequest {
 		RequestMessage message = new RequestMessage();
 		message.setDownloaded(1000l);
 		message.setPort(6070);
-		message.setIp("127.0.0.1");
+		message.setIp("192.168.1.105");
 		message.setLeft(120323l);
 		message.setUploaded(1556l);
-		message.setPeerId(UtilHex.toHexString(
-				ByteBuffer.wrap(messageDigestSHA1.digest())));
-		message.setEvent(RequestEvent.STARTED);
-		message.setInfoHash(UtilHex.toHexString(
-				ByteBuffer.wrap(messageDigestMD5.digest())));
+		message.setPeerId("0A6891889F9FD23B0FAE78E2B5DDDB5B7DFBF274");
+		message.setInfoHash("089EE5299D55BCAFAAC3587B50BD8CD1");
+		//message.setEvent(RequestEvent.STOPPED_FILE);
+//		message.setPeerId(UtilHex.toHexString(
+//				ByteBuffer.wrap(messageDigestSHA1.digest())));
+//		message.setInfoHash(UtilHex.toHexString(
+//				ByteBuffer.wrap(messageDigestMD5.digest())));
 		Tracker tracker = new Tracker();
-		tracker.setSocketAddressListening(new InetSocketAddress(8080));
+		tracker.setSocketAddressListening(new InetSocketAddress("192.168.1.107", 8084));
 		HttpRequest httpRequest = new HttpRequest(tracker, message);
-		InetSocketAddress i = new InetSocketAddress("127.0.0.1", 6067);
-		System.out.println(i.getAddress().getHostAddress());
+		System.out.println("###");
+		httpRequest.sendRequest();
 		
 		
 	}

@@ -1,7 +1,6 @@
 package br.ufla.naivetorrent.persistance;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,11 +29,11 @@ public class DaoInsertShareTorrent {
 	 * @param shareTorrent
 	 * @throws SQLException
 	 */
-	public void insertShareTorrent(ShareTorrent shareTorrent) throws SQLException {
+	public void insertShareTorrent(ShareTorrent shareTorrent) 
+			throws SQLException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(DatabaseContract.PREFIX_SQLITE 
-					+ DatabaseContract.DATABASE_NAME);
+			connection = DatabaseContract.getConnection();
 			connection.setAutoCommit(false);
 			MetaTorrent metaTorrent = shareTorrent.getMetaTorrent();
 			MetaInfoTorrent metaInfo = metaTorrent.getInfo();

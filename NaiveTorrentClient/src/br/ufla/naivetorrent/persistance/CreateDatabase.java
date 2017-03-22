@@ -1,7 +1,6 @@
 package br.ufla.naivetorrent.persistance;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -42,8 +41,7 @@ public class CreateDatabase {
 		List<String> sqlCreateTables = getSqlCreateTables();
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(DatabaseContract.PREFIX_SQLITE + 
-					DatabaseContract.DATABASE_NAME);
+			connection = DatabaseContract.getConnection();
 			connection.setAutoCommit(false);
 			Statement statement = connection.createStatement();
 			for (String sql : sqlCreateTables) {
