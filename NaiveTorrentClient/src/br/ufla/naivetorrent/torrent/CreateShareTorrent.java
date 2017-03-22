@@ -19,6 +19,9 @@ public class CreateShareTorrent {
 	private boolean createSingleFile(String path) {
 		File dir = new File(path.substring(0, path.lastIndexOf('/')));
 		File fileCreate = new File(path);
+		System.out.println(path);
+		System.out.println(dir.getPath());
+		fileCreate = new File(fileCreate.getPath());
 		try {
 			if (dir.mkdirs() && fileCreate.createNewFile()) {
 				return true;
@@ -31,18 +34,21 @@ public class CreateShareTorrent {
 		return false;
 	}
 
-	private boolean createFiles() {
+	public boolean createFiles() {
 		String directory = this.share.getSharePath().getPath();
+		System.out.println(directory);
 		ArrayList<MetaFileTorrent> fields = (ArrayList<MetaFileTorrent>) share.getMetaTorrent().getInfo()
 				.getMetaFiles();
 		for (MetaFileTorrent mt : fields) {
-			String path = directory + mt.getPathFile();
+			System.out.println(mt.getPathFile());
+			String path = new String(directory + mt.getPathFile());
+			System.out.println(path);
 			return createSingleFile(path);
 		}
 		return false;
 	}
 
-	private boolean writePeace(String path,byte[] peaceByteArray) {
+	private boolean writePeace(String path, byte[] peaceByteArray) {
 		try {
 			FileOutputStream output = new FileOutputStream(path, true);
 			output.write(peaceByteArray);
