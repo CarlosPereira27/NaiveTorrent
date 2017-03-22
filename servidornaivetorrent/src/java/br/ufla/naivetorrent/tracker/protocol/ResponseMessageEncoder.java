@@ -45,7 +45,7 @@ public class ResponseMessageEncoder {
 			Map<String, Object> peerDic = new LinkedHashMap<>();
 			peerDic.put(ResponseAttributes.PEER_ID, peer.getIdHex());
 			peerDic.put(ResponseAttributes.PEER_IP, 
-					peer.getSocketAddressListening().getHostName());
+					peer.getSocketAddressListening().getAddress().getHostAddress());
 			peerDic.put(ResponseAttributes.PEER_PORT, 
 					peer.getSocketAddressListening().getPort());
 			peersListDic.add(peerDic);

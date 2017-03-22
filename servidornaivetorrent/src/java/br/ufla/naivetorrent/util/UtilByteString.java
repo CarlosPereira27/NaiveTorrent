@@ -10,7 +10,7 @@ public class UtilByteString {
 	 * @param byteBuffer buffer de bytes
 	 * @return string em UTF-8 equivalente ao buffer de bytes
 	 */
-	public String bytesToString(ByteBuffer byteBuffer) {
+	public static String bytesToString(ByteBuffer byteBuffer) {
 		byte data[] = byteBuffer.array();
 		int length = data.length;
 		StringBuilder sb = new StringBuilder(length);
@@ -27,7 +27,7 @@ public class UtilByteString {
 	 * @param string string a ser convertida em bytes
 	 * @return buffer de bytes que representa a string
 	 */
-	public ByteBuffer stringToBytes(String string) {
+	public static ByteBuffer stringToBytes(String string) {
 		char data[] = string.toCharArray();
 		int length = data.length;
 		byte dataBytes[] = new byte[length];

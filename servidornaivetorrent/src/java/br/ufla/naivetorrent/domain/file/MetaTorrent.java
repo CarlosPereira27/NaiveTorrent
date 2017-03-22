@@ -14,7 +14,7 @@ public class MetaTorrent implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private ByteBuffer infoHash;
-	private InfoMetaTorrent info;
+	private MetaInfoTorrent info;
 	private List<Tracker> trackers;
 	private Date creationDate;
 	private String comment;
@@ -24,8 +24,9 @@ public class MetaTorrent implements Serializable {
 	public MetaTorrent() {
 		trackers = new ArrayList<>();
 		creationDate = new Date();
-		info = new InfoMetaTorrent();
+		info = new MetaInfoTorrent();
 	}
+	
 	
 	/**
 	 * Recupera a lista dos endereços dos trackers.
@@ -38,6 +39,26 @@ public class MetaTorrent implements Serializable {
 		}
 		return announceList;
 	}
+	
+	/**
+	 * Recupera o tempo da criação do torrent
+	 * @return tempo da criação do torrent, se não foi definido null
+	 */
+	public Long getCreationDateTime() {
+		if (creationDate == null)
+			return null;
+		return creationDate.getTime();
+	}
+	
+	/**
+	 * Define a data de criação em relação ao tempo da data.
+	 * @param creationDateTime tempo da data de criação
+	 */
+	public void setCreationDateTime(Long creationDateTime) {
+		if (creationDateTime != null)
+			creationDate = new Date(creationDateTime);
+	}
+
 	
 	public ByteBuffer getInfoHash() {
 		return infoHash;
@@ -76,10 +97,10 @@ public class MetaTorrent implements Serializable {
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
-	public InfoMetaTorrent getInfo() {
+	public MetaInfoTorrent getInfo() {
 		return info;
 	}
-	public void setInfo(InfoMetaTorrent info) {
+	public void setInfo(MetaInfoTorrent info) {
 		this.info = info;
 	}
 	public List<Tracker> getTrackers() {

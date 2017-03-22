@@ -5,15 +5,13 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.ufla.naivetorrent.domain.file.InfoMetaTorrent;
+import br.ufla.naivetorrent.domain.file.MetaInfoTorrent;
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
@@ -62,23 +60,6 @@ public class ReadTorrent {
 	}
 	
 	/**
-	 * Decodifica a lista de chaves hash dos pedaços do arquivo.
-	 * @param metaInfo decodificação dos metadados de informação
-	 * @return lista de chaves hash dos pedaços do arquivo
-	 */
-	private List<ByteBuffer> decodeHashKeys(Map<Object, Object> metaInfo) {
-		List<ByteBuffer> hashPieces = new ArrayList<>();
-		byte hashPiecesBytes[] = ((String) metaInfo
-				.get(InfoMetaTorrent.Attributes.PIECES)).getBytes();
-		int length = hashPiecesBytes.length;
-		for (int i = 0; i < length; i += 20) {
-			hashPieces.add(ByteBuffer.wrap(Arrays
-					.copyOfRange(hashPiecesBytes, i, i + 20)));
-		}
-		return hashPieces;
-	}
-	
-	/**
 	 * Decodifica a lista de metadados dos arquivos compartilhados.
 	 * @param metaInfo decodificação dos metadados de informação
 	 * @return lista de metadados dos arquivos compartilhados
@@ -87,7 +68,7 @@ public class ReadTorrent {
 		List<MetaFileTorrent> metaFiles = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		List<Map<Object, Object>> metaFilesDic = (List<Map<Object, Object>>) 
-				metaInfo.get(InfoMetaTorrent.Attributes.FILES);
+				metaInfo.get(MetaInfoTorrent.Attributes.FILES);
 		for (Map<Object, Object> metaFileDic : metaFilesDic) {
 			MetaFileTorrent metaFile = new MetaFileTorrent();
 			metaFile.setLength((Long) metaFileDic.get(
@@ -108,10 +89,11 @@ public class ReadTorrent {
 		@SuppressWarnings("unchecked")
 		Map<Object, Object> metaInfo = (Map<Object, Object>) 
 				metaFileDecode.get(MetaTorrent.Attributes.INFO);
-		InfoMetaTorrent infoMetaTor = metaTorrent.getInfo();
+		MetaInfoTorrent infoMetaTor = metaTorrent.getInfo();
 		infoMetaTor.setPiecesLength(((Long) metaInfo
-				.get(InfoMetaTorrent.Attributes.PIECE_LENGTH)).intValue());
-		infoMetaTor.setPiecesHash(decodeHashKeys(metaInfo));
+				.get(MetaInfoTorrent.Attributes.PIECE_LENGTH)).intValue());
+		infoMetaTor.setPiecesHashString((String) 
+				metaInfo.get(MetaInfoTorrent.Attributes.PIECES));
 		infoMetaTor.setMetaFiles(decodeMetaFiles(metaInfo));
 	}
 	

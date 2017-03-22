@@ -12,6 +12,18 @@ public class Peer implements Serializable {
 	private ByteBuffer id;
 	private InetSocketAddress socketAddressListening;
 	
+	public String getIpOrHostName() {
+		if (socketAddressListening == null)
+			return null;
+		return socketAddressListening.getAddress().getHostAddress();
+	}
+	
+	public Integer getPort() {
+		if (socketAddressListening == null)
+			return null;
+		return socketAddressListening.getPort();
+	}
+	
 	public ByteBuffer getId() {
 		return id;
 	}
