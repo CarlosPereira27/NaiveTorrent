@@ -124,4 +124,91 @@ public class RequestMessage implements Serializable {
 		this.trackerId = trackerId;
 	}
 
+	
+	// HASHCODE e EQUALS 
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((downloaded == null) ? 0 : downloaded.hashCode());
+		result = prime * result + ((event == null) ? 0 : event.hashCode());
+		result = prime * result + ((infoHash == null) ? 0 : infoHash.hashCode());
+		result = prime * result + ((ip == null) ? 0 : ip.hashCode());
+		result = prime * result + ((left == null) ? 0 : left.hashCode());
+		result = prime * result + ((numWant == null) ? 0 : numWant.hashCode());
+		result = prime * result + ((peerId == null) ? 0 : peerId.hashCode());
+		result = prime * result + ((port == null) ? 0 : port.hashCode());
+		result = prime * result + ((trackerId == null) ? 0 : trackerId.hashCode());
+		result = prime * result + ((uploaded == null) ? 0 : uploaded.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		RequestMessage other = (RequestMessage) obj;
+		if (downloaded == null) {
+			if (other.downloaded != null)
+				return false;
+		} else if (!downloaded.equals(other.downloaded))
+			return false;
+		if (event != other.event)
+			return false;
+		if (infoHash == null) {
+			if (other.infoHash != null)
+				return false;
+		} else if (!infoHash.equals(other.infoHash))
+			return false;
+		if (ip == null) {
+			if (other.ip != null)
+				return false;
+		} else if (!ip.equals(other.ip))
+			return false;
+		if (left == null) {
+			if (other.left != null)
+				return false;
+		} else if (!left.equals(other.left))
+			return false;
+		if (numWant == null) {
+			if (other.numWant != null)
+				return false;
+		} else if (!numWant.equals(other.numWant))
+			return false;
+		if (peerId == null) {
+			if (other.peerId != null)
+				return false;
+		} else if (!peerId.equals(other.peerId))
+			return false;
+		if (port == null) {
+			if (other.port != null)
+				return false;
+		} else if (!port.equals(other.port))
+			return false;
+		if (trackerId == null) {
+			if (other.trackerId != null)
+				return false;
+		} else if (!trackerId.equals(other.trackerId))
+			return false;
+		if (uploaded == null) {
+			if (other.uploaded != null)
+				return false;
+		} else if (!uploaded.equals(other.uploaded))
+			return false;
+		return true;
+	}
+
+	// TOSTRING
+	@Override
+	public String toString() {
+		return "RequestMessage [infoHash=" + infoHash + ", peerId=" + peerId + ", ip=" + ip + ", port=" + port
+				+ ", uploaded=" + uploaded + ", downloaded=" + downloaded + ", left=" + left + ", event=" + event
+				+ ", numWant=" + numWant + ", trackerId=" + trackerId + "]";
+	}
+	
+
+	
 }

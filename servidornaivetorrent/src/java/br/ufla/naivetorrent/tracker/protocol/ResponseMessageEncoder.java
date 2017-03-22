@@ -69,6 +69,8 @@ public class ResponseMessageEncoder {
 		dic.put(ResponseAttributes.COMPLETE, responseMessage.getComplete());
 		dic.put(ResponseAttributes.INCOMPLETE, responseMessage.getIncomplete());
 		dic.put(ResponseAttributes.PEERS, encodeListPeers());
+		if (responseMessage.getClientId() != null)
+			dic.put(ResponseAttributes.CLIENT_ID, responseMessage.getClientId());
 		BEncoder bEncoder = new BEncoder();
 		bEncoder.write(dic);
 		messageEncode = bEncoder.toString();
