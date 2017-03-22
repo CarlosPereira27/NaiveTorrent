@@ -88,6 +88,9 @@ public class ResponseMessageDecoder {
 		responseMessage.setIncomplete((Integer) 
 				dic.get(ResponseAttributes.INCOMPLETE));
 		responseMessage.setPeers(getListPeers(dic));
+		if (dic.containsKey(ResponseAttributes.CLIENT_ID))
+			responseMessage.setClientId((String) 
+					dic.get(ResponseAttributes.CLIENT_ID));
 	}
 	
 	/**

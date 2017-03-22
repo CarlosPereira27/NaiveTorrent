@@ -30,6 +30,39 @@ public class ResponseMessageError implements Serializable {
 	public void setFailureReason(String failureReason) {
 		this.failureReason = failureReason;
 	}
+
+	
+	// HASHCODE e EQUALS
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((failureReason == null) ? 0 : failureReason.hashCode());
+		return result;
+	}
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		ResponseMessageError other = (ResponseMessageError) obj;
+		if (failureReason == null) {
+			if (other.failureReason != null)
+				return false;
+		} else if (!failureReason.equals(other.failureReason))
+			return false;
+		return true;
+	}
+
+	// TOSTRING
+	@Override
+	public String toString() {
+		return "ResponseMessageError [failureReason=" + failureReason + "]";
+	}
+	
 	
 	
 }
