@@ -15,6 +15,8 @@ import br.ufla.naivetorrent.tracker.protocol.ResponseMessageError;
 
 public class HttpRequest implements Runnable {
 	
+	private static final String SERVLET = "/tracker";
+	private static final String PROJECT = "/servidornaivetorrent";
 	@SuppressWarnings("unused")
 	private Tracker tracker;
 	private RequestMessage requestMessage;
@@ -30,8 +32,11 @@ public class HttpRequest implements Runnable {
 		sbResponse = new StringBuilder();
 		sbURL.append(tracker.getSocketAddressListening().getHostName())
 			.append(':')
-			.append(tracker.getSocketAddressListening().getPort());
+			.append(tracker.getSocketAddressListening().getPort())
+			.append(PROJECT)
+			.append(SERVLET);
 		setParameters();
+		System.out.println(sbURL.toString());
 	}
 	
 	/**

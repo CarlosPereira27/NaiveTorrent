@@ -8,7 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.ufla.naivetorrent.domain.file.InfoMetaTorrent;
+import br.ufla.naivetorrent.domain.file.MetaInfoTorrent;
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import gyurix.bencoder.BEncoder;
@@ -52,12 +52,12 @@ public class CreateTorrent {
 	 */
 	private Map<String, Object> getInfoDictionary() {
 		Map<String, Object> infoDictionary = new LinkedHashMap<>();
-		InfoMetaTorrent infoMetaTorrent = metaTorrent.getInfo();
-		infoDictionary.put(InfoMetaTorrent.Attributes.PIECE_LENGTH, 
+		MetaInfoTorrent infoMetaTorrent = metaTorrent.getInfo();
+		infoDictionary.put(MetaInfoTorrent.Attributes.PIECE_LENGTH, 
 				infoMetaTorrent.getPiecesLength());
-		infoDictionary.put(InfoMetaTorrent.Attributes.PIECES, 
+		infoDictionary.put(MetaInfoTorrent.Attributes.PIECES, 
 				infoMetaTorrent.getPiecesHashString());
-		infoDictionary.put(InfoMetaTorrent.Attributes.FILES, 
+		infoDictionary.put(MetaInfoTorrent.Attributes.FILES, 
 				getMetaFiles());
 		return infoDictionary;
 	}

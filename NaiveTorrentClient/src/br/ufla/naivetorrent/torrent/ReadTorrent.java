@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import br.ufla.naivetorrent.domain.file.InfoMetaTorrent;
+import br.ufla.naivetorrent.domain.file.MetaInfoTorrent;
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
@@ -68,7 +68,7 @@ public class ReadTorrent {
 		List<MetaFileTorrent> metaFiles = new ArrayList<>();
 		@SuppressWarnings("unchecked")
 		List<Map<Object, Object>> metaFilesDic = (List<Map<Object, Object>>) 
-				metaInfo.get(InfoMetaTorrent.Attributes.FILES);
+				metaInfo.get(MetaInfoTorrent.Attributes.FILES);
 		for (Map<Object, Object> metaFileDic : metaFilesDic) {
 			MetaFileTorrent metaFile = new MetaFileTorrent();
 			metaFile.setLength((Long) metaFileDic.get(
@@ -89,11 +89,11 @@ public class ReadTorrent {
 		@SuppressWarnings("unchecked")
 		Map<Object, Object> metaInfo = (Map<Object, Object>) 
 				metaFileDecode.get(MetaTorrent.Attributes.INFO);
-		InfoMetaTorrent infoMetaTor = metaTorrent.getInfo();
+		MetaInfoTorrent infoMetaTor = metaTorrent.getInfo();
 		infoMetaTor.setPiecesLength(((Long) metaInfo
-				.get(InfoMetaTorrent.Attributes.PIECE_LENGTH)).intValue());
+				.get(MetaInfoTorrent.Attributes.PIECE_LENGTH)).intValue());
 		infoMetaTor.setPiecesHashString((String) 
-				metaInfo.get(InfoMetaTorrent.Attributes.PIECES));
+				metaInfo.get(MetaInfoTorrent.Attributes.PIECES));
 		infoMetaTor.setMetaFiles(decodeMetaFiles(metaInfo));
 	}
 	

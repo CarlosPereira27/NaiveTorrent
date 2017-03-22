@@ -20,6 +20,19 @@ public class Tracker implements Serializable {
 		return socketAddressListening.getHostName() + ":"
 				+ socketAddressListening.getPort();
 	}
+	
+	public String getIpOrHostName() {
+		if (socketAddressListening == null)
+			return null;
+		return socketAddressListening.getAddress().getHostAddress();
+	}
+	
+	public Integer getPort() {
+		if (socketAddressListening == null)
+			return null;
+		return socketAddressListening.getPort();
+	}
+	
 	public ByteBuffer getId() {
 		return id;
 	}
