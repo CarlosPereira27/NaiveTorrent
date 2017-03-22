@@ -106,8 +106,38 @@ public class ShareTorrent {
 	public Date getLastActivity() {
 		return lastActivity;
 	}
-	
-	
+
+	// MÉTODOS PARA DEFINIÇÃO DE ATRIBUTOS
+	public void setMe(Peer me) {
+		this.me = me;
+	}
+	public void setIdToPeers(Map<ByteBuffer, Peer> idToPeers) {
+		this.idToPeers = idToPeers;
+	}
+	public void setIdToPeersConnected(Map<ByteBuffer, Peer> idToPeersConnected) {
+		this.idToPeersConnected = idToPeersConnected;
+	}
+	public void setIdToBitfield(Map<Peer, BitSet> idToBitfield) {
+		this.idToBitfield = idToBitfield;
+	}
+	public void setUploaded(Integer uploaded) {
+		this.uploaded = uploaded;
+	}
+	public void setDownloaded(Integer downloaded) {
+		this.downloaded = downloaded;
+	}
+	public void setMetaTorrent(MetaTorrent metaTorrent) {
+		this.metaTorrent = metaTorrent;
+	}
+	public void setMyBitfield(BitSet myBitfield) {
+		this.myBitfield = myBitfield;
+	}
+	public void setLastActivity(Date lastActivity) {
+		this.lastActivity = lastActivity;
+	}
+	public void setSharePath(File sharePath) {
+		this.sharePath = sharePath;
+	}
 	
 
 }

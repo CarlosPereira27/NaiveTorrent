@@ -79,7 +79,9 @@ public class Peer implements Serializable {
 	// TOSTRING
 	@Override
 	public String toString() {
-		return "Peer [id=" + id + ", socketAddressListening=" + socketAddressListening + "]";
+		return "Peer [ id = " + UtilHex.toHexString(id)
+				+ ", socketAddressListening = " + getIpOrHostName() + ":"
+				+ getPort() + "]";
 	}
 	
 }
