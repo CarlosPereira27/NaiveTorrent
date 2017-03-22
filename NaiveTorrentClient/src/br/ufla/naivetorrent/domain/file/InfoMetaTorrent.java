@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import br.ufla.naivetorrent.util.UtilByteString;
+
 public class InfoMetaTorrent implements Serializable  {
 	
 	private static final long serialVersionUID = 1L;
@@ -38,6 +40,7 @@ public class InfoMetaTorrent implements Serializable  {
 	 * Recupera o tamanho em bytes das hash dos pedaços do arquivo.
 	 * @return tamanho em bytes das hash dos pedaços do arquivo.
 	 */
+	@SuppressWarnings("unused")
 	private int getPiecesHashBufferLength() {
 		int length = 0;
 		for (ByteBuffer pieceHash : piecesHash) {
@@ -51,17 +54,28 @@ public class InfoMetaTorrent implements Serializable  {
 	 * @return hash dos pedaços do arquivo em uma string
 	 */
 	public String getPiecesHashString() {
-		int lengthPiecesHash = getPiecesHashBufferLength();
-		byte data[] = new byte[lengthPiecesHash];
-		int ind = 0;
-		for (ByteBuffer pieceHash : piecesHash) {
-			byte b[] = pieceHash.array();
-			int length = b.length;
-			for (int i = 0; i < length; i++) {
-				data[ind++] = b[i];
-			}
+		int size = piecesHash.size();
+		StringBuilder sb = new StringBuilder(size * 20);
+		for (int i = 0; i < size; i++) {
+			sb.append(UtilByteString.bytesToString(piecesHash.get(i)));
 		}
-		return new String(data);
+		return sb.toString();
+	}
+	
+	/**
+	 * Define a lista de chaves hash dos pedaços em relação a uma string de 
+	 * bytes codificada em UTF-8.
+	 * @param piecesHashString string de bytes codificada em UTF-8 que contém
+	 * as chaves hash dos pedaços
+	 */
+	public void setPiecesHashString(String piecesHashString) {
+		piecesHash = new ArrayList<>();
+		char data[] = piecesHashString.toCharArray();
+		int size = data.length / 20;
+		for (int i = 0; i < size; i++) {
+			piecesHash.add(UtilByteString.stringToBytes(
+					new String(data, i * 20, 20)));
+		}
 	}
 	
 	// MÉTODOS ACESSORES

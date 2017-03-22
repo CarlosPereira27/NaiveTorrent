@@ -3,10 +3,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
-import java.nio.charset.Charset;
 import java.util.Arrays;
-import java.util.Map;
 
 import org.junit.Test;
 
@@ -31,7 +28,7 @@ public class TestGenerateTorrent {
 	}
 	
 	@Test
-	public void test() 
+	public void testCreateFile() 
 			throws IOException {
 		File shareFile = new File("/home/carlos/workspaceTorrent/NaiveTorrent/"
 				+ "NaiveTorrentClient");
@@ -53,31 +50,8 @@ public class TestGenerateTorrent {
 
 	}
 	
-	public String bytesToString(ByteBuffer byteBuffer) {
-		byte data[] = byteBuffer.array();
-		int length = data.length;
-		StringBuilder sb = new StringBuilder(length);
-		for (int i = 0; i < length; i++) {
-			char c = (char) (data[i] & 0xFF);
-			
-			System.out.println((int) c);
-			sb.append(c);
-		}
-		return sb.toString();
-	}
-	
-	public ByteBuffer stringToBytes(String string) {
-		char data[] = string.toCharArray();
-		int length = data.length;
-		byte dataBytes[] = new byte[length];
-		for (int i = 0; i < length; i++) {
-			dataBytes[i] = (byte) data[i];
-		}
-		return ByteBuffer.wrap(dataBytes);
-	}
-	
 	@Test
-	public void readTest() 
+	public void readFileTest() 
 			throws IOException {
 		File shareFile = new File("/home/carlos/workspaceTorrent/NaiveTorrent/"
 				+ "NaiveTorrentClient");
@@ -94,22 +68,11 @@ public class TestGenerateTorrent {
 		tracker3.setSocketAddressListening(new InetSocketAddress("192.168.0.101", 8080));
 		extractMetaInfo.setTrackers(Arrays.asList(tracker1, tracker2, tracker3));
 		MetaTorrent metaTorrentCreated = extractMetaInfo.generateMetaTorrent();
+		CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated,
+				torrentFile);
+		createTorrent.create();
 		ReadTorrent readTorrent = new ReadTorrent(torrentFile);
 		MetaTorrent metaTorrentRead = readTorrent.read();
-		assertEquals(metaTorrentCreated.getCreatedBy(), metaTorrentRead.getCreatedBy());
-		//assertEquals(metaTorrentCreated.getCreationDate(), metaTorrentRead.getCreationDate());
-		assertEquals(metaTorrentCreated.getEncoding(), metaTorrentRead.getEncoding());
-		assertEquals(metaTorrentCreated.getComment(), metaTorrentRead.getComment());
-		byte b[] = new byte[256];
-		for (int i = 0; i < 256; i++) {
-			b[i] = (byte) i;
-		}
-		String str = bytesToString(ByteBuffer.wrap(b));
-		String str2 = new String(b);
-		System.out.println(Arrays.toString(b));
-		System.out.println(str);
-		System.out.println(Arrays.toString(stringToBytes(str).array()));
-		assertEquals(metaTorrentCreated.getInfoHash(), metaTorrentRead.getInfoHash());
 		assertEquals(metaTorrentCreated, metaTorrentRead);
 	}
 
