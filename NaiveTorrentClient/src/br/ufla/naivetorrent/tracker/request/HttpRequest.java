@@ -12,7 +12,6 @@ import br.ufla.naivetorrent.tracker.protocol.RequestParameters;
 import br.ufla.naivetorrent.tracker.protocol.ResponseMessage;
 import br.ufla.naivetorrent.tracker.protocol.ResponseMessageDecoder;
 import br.ufla.naivetorrent.tracker.protocol.ResponseMessageError;
-import br.ufla.naivetorrent.util.UtilHex;
 
 public class HttpRequest implements Runnable {
 	
@@ -113,7 +112,6 @@ public class HttpRequest implements Runnable {
 				ResponseMessageError responseMessageError = 
 					responseMessageDecoder.getResponseMessageError();
 			} else {
-				@SuppressWarnings("unused")
 				ResponseMessage responseMessage = 
 					responseMessageDecoder.getResponseMessage();
 				System.out.println(responseMessage);

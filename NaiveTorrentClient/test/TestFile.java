@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.InternalFrameFocusTraversalPolicy;
 
@@ -22,6 +25,48 @@ public class TestFile {
 		dir.mkdirs();
 		//System.out.println(file.createNewFile());
 	}*/
+	
+	private int index = 0;
+	
+
+	@Test
+	public void test2() {
+		byte b[] = new byte[4];
+		b[2] = 39;
+		b[3] = 18;
+		System.out.println(10002);
+		byte c[] = BigInteger.valueOf(10002).toByteArray();
+		System.out.println(Arrays.toString(c));
+		System.out.println(Arrays.toString(b));
+		System.out.println(new BigInteger(b).intValue());
+	}
+	
+
+	
+	@Test
+	public void test1() throws Exception {
+		String command = "create-torrent \"/home/carlos/download/teste\" "
+				+ "\"/home/carlos/download/teste.torrent\" "
+				+ "{ 192.168.0.1:8067, 192.168.0.1:8080, 192.168.0.1:7070 } "
+				+ "\"Carlos Pereira\" \"Comentários do torrent\" "
+				+ "\"codificação UTF-8\"";
+		System.out.println(command);
+		ExtractCommand extractCommand = new ExtractCommand(command);
+		String cmd = extractCommand.readCmd();
+		String sharePath = extractCommand.readParameter();
+		String torrentPath = extractCommand.readParameter();
+		List<String> trackers = extractCommand.readList();
+		String createdBy = extractCommand.readParameter();
+		String comment = extractCommand.readParameter();
+		String encoding = extractCommand.readParameter();
+		System.out.println(cmd);
+		System.out.println(sharePath);
+		System.out.println(torrentPath);
+		System.out.println(createdBy);
+		System.out.println(Arrays.toString(trackers.toArray()));
+		System.out.println(comment);
+		System.out.println(encoding);
+	}
 	
 	@Test
 	public void empty() throws IOException{
