@@ -22,9 +22,10 @@ import br.ufla.naivetorrent.persistance.contract.TorrentTrackerContract;
 import br.ufla.naivetorrent.persistance.contract.TrackerContract;
 
 public class DaoRecoveryShareTorrents {
-	
+
 	/**
 	 * Recupera a lista de shareTorrents no banco.
+	 * 
 	 * @return lista de shareTorrents
 	 */
 	public List<ShareTorrent> getShareTorrents() {
@@ -34,8 +35,7 @@ public class DaoRecoveryShareTorrents {
 		ResultSet rs = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			ps = connection.prepareStatement("SELECT * FROM " 
-					+ MetaTorrentContract.TABLE_NAME);
+			ps = connection.prepareStatement("SELECT * FROM " + MetaTorrentContract.TABLE_NAME);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				ShareTorrent shareTorrent = new ShareTorrent();
@@ -43,28 +43,17 @@ public class DaoRecoveryShareTorrents {
 				Integer idTorrent = null;
 				Integer idMetaInfo = null;
 				MetaInfoTorrent metaInfoTorrent = null;
-				shareTorrent.setMyBitfieldString(rs.getString(
-						MetaTorrentContract.Columns.BITFIELD));
-				shareTorrent.setMyBitfieldString(rs.getString(
-						MetaTorrentContract.Columns.COMMENT));
-				metaTorrent.setCreatedBy(rs.getString(
-						MetaTorrentContract.Columns.CREATED_BY));
-				metaTorrent.setCreationDateTime(rs.getLong(
-						MetaTorrentContract.Columns.CREATION_DATE));
-				shareTorrent.setDownloaded(rs.getInt(
-						MetaTorrentContract.Columns.DOWNLOADED));
-				metaTorrent.setEncoding(rs.getString(
-						MetaTorrentContract.Columns.ENCODING));
-				idTorrent = rs.getInt(
-						MetaTorrentContract.Columns.ID);
-				metaTorrent.setInfoHash(rs.getString(
-						MetaTorrentContract.Columns.INFO_HASH));
-				shareTorrent.setLastActivityTime(rs.getLong(
-						MetaTorrentContract.Columns.LAST_ACTIVITY));
-				shareTorrent.setSharePathString(rs.getString(
-						MetaTorrentContract.Columns.SHARE_PATH));
-				shareTorrent.setUploaded(rs.getInt(
-						MetaTorrentContract.Columns.UPLOADED));
+				shareTorrent.setMyBitfieldString(rs.getString(MetaTorrentContract.Columns.BITFIELD));
+				shareTorrent.setMyBitfieldString(rs.getString(MetaTorrentContract.Columns.COMMENT));
+				metaTorrent.setCreatedBy(rs.getString(MetaTorrentContract.Columns.CREATED_BY));
+				metaTorrent.setCreationDateTime(rs.getLong(MetaTorrentContract.Columns.CREATION_DATE));
+				shareTorrent.setDownloaded(rs.getInt(MetaTorrentContract.Columns.DOWNLOADED));
+				metaTorrent.setEncoding(rs.getString(MetaTorrentContract.Columns.ENCODING));
+				idTorrent = rs.getInt(MetaTorrentContract.Columns.ID);
+				metaTorrent.setInfoHash(rs.getString(MetaTorrentContract.Columns.INFO_HASH));
+				shareTorrent.setLastActivityTime(rs.getLong(MetaTorrentContract.Columns.LAST_ACTIVITY));
+				shareTorrent.setSharePathString(rs.getString(MetaTorrentContract.Columns.SHARE_PATH));
+				shareTorrent.setUploaded(rs.getInt(MetaTorrentContract.Columns.UPLOADED));
 				metaTorrent.setTrackers(getTrackers(idTorrent));
 				idMetaInfo = getIdMetaInfo(idTorrent);
 				metaInfoTorrent = getMetaInfo(idMetaInfo);
@@ -77,22 +66,28 @@ public class DaoRecoveryShareTorrents {
 			System.err.println(e.getMessage());
 		} finally {
 			try {
-				if (connection != null)
-					connection.close();
-				if (ps != null)
+				if (ps != null) {
 					ps.close();
-				if (rs != null)
+				}
+				if (rs != null) {
 					rs.close();
+				}
+				if (connection != null) {
+					connection.close();
+				}
 			} catch (SQLException e) {
+				e.printStackTrace();
 				System.err.println(e);
 			}
 		}
 		return listTorrents;
 	}
-		
+
 	/**
 	 * Recupera a lista de trackers de um determinado torrent.
-	 * @param idTorrent id do torrent
+	 * 
+	 * @param idTorrent
+	 *            id do torrent
 	 * @return lista de trackers
 	 * @throws SQLException
 	 */
@@ -106,10 +101,9 @@ public class DaoRecoveryShareTorrents {
 		try {
 			connection = DatabaseContract.getConnection();
 			for (Integer idTracker : idsTrackers) {
-				ps = connection.prepareStatement("SELECT * " 
-						+ " FROM " + TrackerContract.TABLE_NAME + "\n"
-						+ "WHERE " + TrackerContract.Columns.ID
-						+ " = ?");
+				ps = connection.prepareStatement(
+						"SELECT * " + " FROM " + TrackerContract.TABLE_NAME + "\n" 
+						+ "WHERE " + TrackerContract.Columns.ID + " = ?");
 				ps.setInt(1, idTracker);
 				rs = ps.executeQuery();
 				if (rs.next()) {
@@ -117,24 +111,29 @@ public class DaoRecoveryShareTorrents {
 					tracker.setIdHex(rs.getString(TrackerContract.Columns.HASH_ID));
 					String ip = rs.getString(TrackerContract.Columns.HOST_NAME);
 					Integer port = rs.getInt(TrackerContract.Columns.PORT);
-					tracker.setSocketAddressListening(new InetSocketAddress(ip, port));
+					tracker.setAddressListening(new InetSocketAddress(ip, port));
 					trackers.add(tracker);
 				}
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return trackers;
 	}
-	
+
 	/**
 	 * Recupera a lista de ids dos trackers de um determinado torrent.
-	 * @param idTorrent id do torrent a ser recuperado lista de ids de trackers
+	 * 
+	 * @param idTorrent
+	 *            id do torrent a ser recuperado lista de ids de trackers
 	 * @return lista de ids dos trackers
 	 * @throws SQLException
 	 */
@@ -146,30 +145,34 @@ public class DaoRecoveryShareTorrents {
 		ResultSet rs = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			ps = connection.prepareStatement("SELECT " 
-					+ TorrentTrackerContract.Columns.ID_TRACKER 
-					+ " FROM " + TorrentTrackerContract.TABLE_NAME + "\n"
-					+ "WHERE " + TorrentTrackerContract.Columns.ID_TORRENT
-					+ " = ?");
+			ps = connection.prepareStatement(
+					"SELECT " + TorrentTrackerContract.Columns.ID_TRACKER 
+					+ " FROM " + TorrentTrackerContract.TABLE_NAME + "\n" 
+					+ "WHERE " + TorrentTrackerContract.Columns.ID_TORRENT + " = ?");
 			ps.setInt(1, idTorrent);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				idsTrackers.add(rs.getInt(1));
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return idsTrackers;
 	}
-	
+
 	/**
 	 * Recupera as informações de um determinado torrent.
-	 * @param idMetaInfo id das informações
+	 * 
+	 * @param idMetaInfo
+	 *            id das informações
 	 * @return informações de um determinado torrent
 	 * @throws SQLException
 	 */
@@ -181,10 +184,9 @@ public class DaoRecoveryShareTorrents {
 		ResultSet rs = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			ps = connection.prepareStatement("SELECT *"
-					+ " FROM " + MetaInfoTorrentContract.TABLE_NAME + "\n"
-					+ "WHERE " + MetaInfoTorrentContract.Columns.ID
-					+ " = ?");
+			ps = connection.prepareStatement(
+					"SELECT *" + " FROM " + MetaInfoTorrentContract.TABLE_NAME + "\n"
+					+ "WHERE " + MetaInfoTorrentContract.Columns.ID + " = ?");
 			ps.setInt(1, idMetaInfo);
 			rs = ps.executeQuery();
 			if (rs.next()) {
@@ -195,19 +197,24 @@ public class DaoRecoveryShareTorrents {
 						MetaInfoTorrentContract.Columns.PIECES_HASH));
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return metaInfoTorrent;
 	}
-	
+
 	/**
 	 * Recupera o id de informações de um determinado torrent.
-	 * @param idTorrent id do torrent
+	 * 
+	 * @param idTorrent
+	 *            id do torrent
 	 * @return id das informações do torrent
 	 * @throws SQLException
 	 */
@@ -219,30 +226,34 @@ public class DaoRecoveryShareTorrents {
 		ResultSet rs = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			ps = connection.prepareStatement("SELECT " 
-					+ TorrentInfoContract.Columns.ID_INFO
+			ps = connection.prepareStatement(
+					"SELECT " + TorrentInfoContract.Columns.ID_INFO 
 					+ " FROM " + TorrentInfoContract.TABLE_NAME + "\n"
-					+ "WHERE " + TorrentInfoContract.Columns.ID_TORRENT
-					+ " = ?");
+					+ "WHERE " + TorrentInfoContract.Columns.ID_TORRENT + " = ?");
 			ps.setInt(1, idTorrent);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				idMetaFile = rs.getInt(1);
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return idMetaFile;
 	}
-	
+
 	/**
 	 * Recupera a lista de arquivos de um determinado torrent.
-	 * @param idInfo id da informação torrent
+	 * 
+	 * @param idInfo
+	 *            id da informação torrent
 	 * @return lista de arquivos
 	 * @throws SQLException
 	 */
@@ -256,10 +267,9 @@ public class DaoRecoveryShareTorrents {
 		try {
 			connection = DatabaseContract.getConnection();
 			for (Integer idMetaFile : idsMetaFiles) {
-				ps = connection.prepareStatement("SELECT * " 
-						+ " FROM " + MetaFileTorrentContract.TABLE_NAME + "\n"
-						+ "WHERE " + MetaFileTorrentContract.Columns.ID
-						+ " = ?");
+				ps = connection.prepareStatement(
+						"SELECT * " + " FROM " + MetaFileTorrentContract.TABLE_NAME + "\n"
+						+ "WHERE " + MetaFileTorrentContract.Columns.ID + " = ?");
 				ps.setInt(1, idMetaFile);
 				rs = ps.executeQuery();
 				if (rs.next()) {
@@ -274,19 +284,25 @@ public class DaoRecoveryShareTorrents {
 				}
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return metaFiles;
 	}
-	
+
 	/**
-	 * Recupera a lista de ids de arquivos referentes à informação de um determinado torrent.
-	 * @param idInfo id da informação do torrent
+	 * Recupera a lista de ids de arquivos referentes à informação de um
+	 * determinado torrent.
+	 * 
+	 * @param idInfo
+	 *            id da informação do torrent
 	 * @return lista de ids dos arquivos
 	 * @throws SQLException
 	 */
@@ -298,31 +314,36 @@ public class DaoRecoveryShareTorrents {
 		ResultSet rs = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			ps = connection.prepareStatement("SELECT " 
-					+ InfoFileContract.Columns.ID_FILE
-					+ " FROM " + InfoFileContract.TABLE_NAME + "\n"
-					+ "WHERE " + InfoFileContract.Columns.ID_INFO
-					+ " = ?");
+			ps = connection.prepareStatement(
+					"SELECT " + InfoFileContract.Columns.ID_FILE 
+					+ " FROM " + InfoFileContract.TABLE_NAME + "\n" 
+					+ "WHERE " + InfoFileContract.Columns.ID_INFO + " = ?");
 			ps.setInt(1, idInfo);
 			rs = ps.executeQuery();
 			while (rs.next()) {
 				idsMetaFiles.add(rs.getInt(1));
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
-			if (connection != null)
+			}
+			if (connection != null) {
 				connection.close();
+			}
 		}
 		return idsMetaFiles;
 	}
-	
+
 	/**
 	 * Recupera o id de um determinado torrent
-	 * @param con conexão com o banco
-	 * @param infoHash info do hash do torrent a ser recuperado
+	 * 
+	 * @param con
+	 *            conexão com o banco
+	 * @param infoHash
+	 *            info do hash do torrent a ser recuperado
 	 * @return id do torrent
 	 * @throws SQLException
 	 */
@@ -334,21 +355,25 @@ public class DaoRecoveryShareTorrents {
 		Connection con = null;
 		try {
 			con = DatabaseContract.getConnection();
-			ps = con.prepareStatement("SELECT "
-					+ MetaTorrentContract.Columns.ID
+			ps = con.prepareStatement(
+					"SELECT " + MetaTorrentContract.Columns.ID 
 					+ " FROM " + MetaTorrentContract.TABLE_NAME + "\n"
-					+ "WHERE " + MetaTorrentContract.Columns.INFO_HASH
-					+ " = ?");
+					+ "WHERE " + MetaTorrentContract.Columns.INFO_HASH + " = ?");
 			ps.setString(1, infoHash);
 			rs = ps.executeQuery();
 			if (rs.next()) {
 				idTorrent = rs.getInt(1);
 			}
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
+			if (con != null) {
+				con.close();
+			}
 		}
 		return idTorrent;
 	}

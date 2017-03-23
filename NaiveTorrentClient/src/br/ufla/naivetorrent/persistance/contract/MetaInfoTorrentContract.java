@@ -14,7 +14,8 @@ public class MetaInfoTorrentContract {
             piecesHash TEXT NOT NULL);"
     */
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
+    public static final String CREATE_TABLE = 
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
             + Columns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
             + Columns.PIECES_LENGTH + " INTEGER NOT NULL, "
             + Columns.PIECES_HASH + " TEXT NOT NULL );";

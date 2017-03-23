@@ -6,8 +6,11 @@
 
 package br.ufla.naivetorrent.cli;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import br.ufla.naivetorrent.domain.file.ShareTorrent;
 
 /**
  * 
@@ -15,14 +18,40 @@ import java.util.logging.Logger;
  */
 public class Display implements Runnable {
 
-	private boolean ativa = true;
+	private static final String EMPTY_TXT =
+			"-----------------------------------------\n"
+			+ "O usuário não possui torrents atualmente!\n"
+			+ "-----------------------------------------\n"
+			+ "# Entre com o comando 'cmd' para entrar na interface de inserção de comandos.\n"
+			+ "# Uma vez nesta interface é possível criar e adicionar torrents.\n"
+			+ "# O comando 'help' mostra a lista de comandos aceitos pelo NaiveTorrent.\n"
+			+ "# O comando 'quit' fecha o NaiveTorrent adequadamente.\n";
+	private List<ShareTorrent> shareTorrents;
+	private boolean ativa;
+
+	public Display(List<ShareTorrent> shareTorrents) {
+		this.shareTorrents = shareTorrents;
+		ativa = true;
+	}
+	
+	private void displayData() {
+		synchronized (shareTorrents) {
+			int n = shareTorrents.size();
+			for (int i = 0; i < n; i++) {
+				System.out.println(shareTorrents.get(i).toString());
+			}
+			if (n == 0) {
+				System.out.println(EMPTY_TXT);
+			}
+		}
+	}
 
 	@Override
 	public void run() {
 		ConsoleClear.clear();
 		while (isAtiva()) {
 			try {
-				System.out.println("DISPLAY DADOS");
+				displayData();
 				Thread.sleep(3000);
 				if (isAtiva()) {
 					ConsoleClear.clear();

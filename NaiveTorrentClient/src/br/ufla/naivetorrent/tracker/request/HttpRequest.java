@@ -32,9 +32,9 @@ public class HttpRequest implements Runnable {
 		sbURL = new StringBuilder();
 		sbResponse = new StringBuilder();
 		sbURL.append(PROTOCOL)
-			.append(tracker.getSocketAddressListening().getHostName())
+			.append(tracker.getAddressListening().getHostName())
 			.append(':')
-			.append(tracker.getSocketAddressListening().getPort())
+			.append(tracker.getAddressListening().getPort())
 			.append(PROJECT)
 			.append(SERVLET);
 		setParameters();

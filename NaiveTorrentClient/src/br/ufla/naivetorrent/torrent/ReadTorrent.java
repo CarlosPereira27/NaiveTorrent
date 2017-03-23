@@ -111,7 +111,7 @@ public class ReadTorrent {
 			String hostName = announce.substring(0, index);
 			Integer port = Integer.parseInt(announce.substring(index + 1, 
 					announce.length()));
-			tracker.setSocketAddressListening(new InetSocketAddress(hostName, port));
+			tracker.setAddressListening(new InetSocketAddress(hostName, port));
 			trackers.add(tracker);
 		}
 		metaTorrent.setTrackers(trackers);

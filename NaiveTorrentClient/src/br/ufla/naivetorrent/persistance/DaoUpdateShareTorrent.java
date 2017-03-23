@@ -9,11 +9,14 @@ import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.persistance.contract.MetaTorrentContract;
 
 public class DaoUpdateShareTorrent {
-	
+
 	/**
 	 * Realiza a atualização de um shareTorrent.
-	 * @param shareTorrent share torrent a ser atualizado
-	 * @return true se shareTorrent foi atualizado com sucesso, false caso contrário
+	 * 
+	 * @param shareTorrent
+	 *            share torrent a ser atualizado
+	 * @return true se shareTorrent foi atualizado com sucesso, false caso
+	 *         contrário
 	 * @throws SQLException
 	 */
 	public boolean update(ShareTorrent shareTorrent) 
@@ -22,19 +25,16 @@ public class DaoUpdateShareTorrent {
 		PreparedStatement ps = null;
 		try {
 			connection = DatabaseContract.getConnection();
-			DaoRecoveryShareTorrents daoRecoveryShareTorrents = 
-					new DaoRecoveryShareTorrents();
+			DaoRecoveryShareTorrents daoRecoveryShareTorrents = new DaoRecoveryShareTorrents();
 			MetaTorrent metaTorrent = shareTorrent.getMetaTorrent();
-			Integer idTorrent = daoRecoveryShareTorrents
-					.getIdTorrent(metaTorrent.getInfoHashHex());
-			ps = connection.prepareStatement("UPDATE " 
-					+ MetaTorrentContract.TABLE_NAME
-					+ "\nSET " 
-					+ MetaTorrentContract.Columns.BITFIELD + " = ?, "
-					+ MetaTorrentContract.Columns.DOWNLOADED + " = ?, "
+			Integer idTorrent = daoRecoveryShareTorrents.getIdTorrent(metaTorrent.getInfoHashHex());
+			ps = connection.prepareStatement(
+					"UPDATE " + MetaTorrentContract.TABLE_NAME 
+					+ "\nSET " + MetaTorrentContract.Columns.BITFIELD + " = ?, " 
+					+ MetaTorrentContract.Columns.DOWNLOADED + " = ?, " 
 					+ MetaTorrentContract.Columns.LAST_ACTIVITY + " = ?, "
-					+ MetaTorrentContract.Columns.SHARE_PATH + " = ?, "
-					+ MetaTorrentContract.Columns.UPLOADED + " = ?\n"
+					+ MetaTorrentContract.Columns.SHARE_PATH + " = ?, " 
+					+ MetaTorrentContract.Columns.UPLOADED + " = ?\n" 
 					+ "WHERE " + MetaTorrentContract.Columns.ID + " = ?");
 			ps.setString(1, shareTorrent.getMyBitfieldString());
 			ps.setInt(2, shareTorrent.getDownloaded());
@@ -48,8 +48,12 @@ public class DaoUpdateShareTorrent {
 			return false;
 		} finally {
 			try {
-				if (connection != null)
+				if (ps != null) {
+					ps.close();
+				}
+				if (connection != null) {
 					connection.close();
+				}
 			} catch (SQLException e) {
 				System.err.println(e);
 			}

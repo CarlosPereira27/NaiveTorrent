@@ -40,11 +40,11 @@ public class TestGenerateTorrent2 {
 		extractMetaInfo.setComment("hello world");
 		extractMetaInfo.setEncoding("utf-8");
 		Tracker tracker1 = new Tracker();
-		tracker1.setSocketAddressListening(new InetSocketAddress("127.0.0.1", 8080));
+		tracker1.setAddressListening(new InetSocketAddress("127.0.0.1", 8080));
 		Tracker tracker2 = new Tracker();
-		tracker2.setSocketAddressListening(new InetSocketAddress("192.168.0.1", 8080));
+		tracker2.setAddressListening(new InetSocketAddress("192.168.0.1", 8080));
 		Tracker tracker3 = new Tracker();
-		tracker3.setSocketAddressListening(new InetSocketAddress("192.168.0.101", 8080));
+		tracker3.setAddressListening(new InetSocketAddress("192.168.0.101", 8080));
 		extractMetaInfo.setTrackers(Arrays.asList(tracker1, tracker2, tracker3));
 		MetaTorrent metaTorrent = extractMetaInfo.generateMetaTorrent();
 		CreateTorrent makeTorrent = new CreateTorrent(metaTorrent, torrentFile);
@@ -63,11 +63,11 @@ public class TestGenerateTorrent2 {
 		extractMetaInfo.setComment("hello world");
 		extractMetaInfo.setEncoding("utf-8");
 		Tracker tracker1 = new Tracker();
-		tracker1.setSocketAddressListening(new InetSocketAddress("127.0.0.1", 8080));
+		tracker1.setAddressListening(new InetSocketAddress("127.0.0.1", 8080));
 		Tracker tracker2 = new Tracker();
-		tracker2.setSocketAddressListening(new InetSocketAddress("192.168.0.1", 8080));
+		tracker2.setAddressListening(new InetSocketAddress("192.168.0.1", 8080));
 		Tracker tracker3 = new Tracker();
-		tracker3.setSocketAddressListening(new InetSocketAddress("192.168.0.101", 8080));
+		tracker3.setAddressListening(new InetSocketAddress("192.168.0.101", 8080));
 		extractMetaInfo.setTrackers(Arrays.asList(tracker1, tracker2, tracker3));
 		MetaTorrent metaTorrentCreated = extractMetaInfo.generateMetaTorrent();
 		CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated,

@@ -23,7 +23,6 @@ public class ShareTorrent {
 		@Override
 		public void run() {
 			while (true) {
-				if (onDonwloading )
 			}
 			
 		}
@@ -55,8 +54,6 @@ public class ShareTorrent {
 			nextDownloadPieces.addAll(downloadStrategy.getPieces());
 		}
 	}
-	
-	public void set
 	
 	
 	public ShareTorrent() {

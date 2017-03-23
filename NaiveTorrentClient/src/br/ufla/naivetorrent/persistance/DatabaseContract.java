@@ -13,19 +13,21 @@ public class DatabaseContract {
 	 * URL do banco de dados.
 	 */
 	public static final String DATABASE_URL = "jdbc:sqlite:naiveTorrentClient.db";
-	
+
 	/**
 	 * Recupera as propriedades do banco.
+	 * 
 	 * @return propriedades do banco
 	 */
 	private static Properties getProperties() {
-		SQLiteConfig config = new SQLiteConfig();  
-        config.enforceForeignKeys(true);
-        return config.toProperties();
+		SQLiteConfig config = new SQLiteConfig();
+		config.enforceForeignKeys(true);
+		return config.toProperties();
 	}
-	
+
 	/**
 	 * Recupera uma conexão com o banco.
+	 * 
 	 * @return conexão com o banco
 	 * @throws SQLException
 	 */

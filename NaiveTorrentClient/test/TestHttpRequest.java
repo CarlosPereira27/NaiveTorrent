@@ -75,7 +75,7 @@ public class TestHttpRequest {
 //		message.setInfoHash(UtilHex.toHexString(
 //				ByteBuffer.wrap(messageDigestMD5.digest())));
 		Tracker tracker = new Tracker();
-		tracker.setSocketAddressListening(new InetSocketAddress("192.168.1.107", 8084));
+		tracker.setAddressListening(new InetSocketAddress("192.168.1.107", 8084));
 		HttpRequest httpRequest = new HttpRequest(tracker, message);
 		System.out.println("###");
 		httpRequest.sendRequest();

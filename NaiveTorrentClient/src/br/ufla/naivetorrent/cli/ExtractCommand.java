@@ -1,13 +1,20 @@
+package br.ufla.naivetorrent.cli;
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExtractCommand {
 	
 	private int index;
-	private String tokens[];
+	private String[] tokens;
 	
 	public ExtractCommand (String commando) {
 		tokens = commando.split(" ");
+		clearTokens();
+		index = 0;
+	}
+	
+	public ExtractCommand (String[] tokens) {
+		this.tokens = tokens;
 		clearTokens();
 		index = 0;
 	}
@@ -52,7 +59,7 @@ public class ExtractCommand {
 		}
 		// parâmetro incorreto
 		if (!firstIndexIs(tokens[index], '\"')) {
-			throw new Exception("Parâmetro incorreto!");
+			throw new Exception("Parâmetro incorreto! Parâmetro deve começar com '\"'.");
 		}
 		// apenas um token
 		if (lastIndexIs(tokens[index], '\"')) {
@@ -60,8 +67,13 @@ public class ExtractCommand {
 			return tokens[index-1].substring(1, tokens[index-1].length()-1);
 		}
 		String parameter = tokens[index++].substring(1);
-		while (!lastIndexIs(tokens[index], '\"')) {
+		int length = tokens.length;
+		while (index < length && !lastIndexIs(tokens[index], '\"')) {
 			parameter += " " + tokens[index++];
+		}
+		if (index == length) {
+			throw new Exception("Parâmetro incorreto (" + parameter + ")!" 
+					+ "\nParâmetro deve terminar com '\"'.");
 		}
 		parameter += " " + tokens[index].substring(0, tokens[index].length()-1);
 		index++;
@@ -97,7 +109,8 @@ public class ExtractCommand {
 			throws Exception  {
 		List<String> list = new ArrayList<>();
 		if (!firstIndexIs(tokens[index], '{')) {
-			throw new Exception("Parâmetro incorreto!");
+			throw new Exception("Lista de parâmetros incorreta!\n"
+					+ "Lista deve começar com o caractere '{'.");
 		}
 		if (tokens[index].length() == 1) {
 			index++;
@@ -109,13 +122,18 @@ public class ExtractCommand {
 			list.add(tokens[index].substring(1));
 			index++;
 		}
-		while (!lastIndexIs(tokens[index], '}')) {
+		int n = tokens.length;
+		while (index < n && !lastIndexIs(tokens[index], '}')) {
 			if (lastIndexIs(tokens[index], ',')) {
 				list.add(tokens[index].substring(0, tokens[index].length()-1));
 			} else {
 				list.add(tokens[index]);
 			}
 			index++;
+		}
+		if (index == n) {
+			throw new Exception("Lista de parâmetros incorreta!\n"
+					+ "Lista deve terminar com o caractere '}'.");
 		}
 		if (tokens[index].length() != 1) {
 			list.add(tokens[index].substring(0, tokens[index].length()-1));

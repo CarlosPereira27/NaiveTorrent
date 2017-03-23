@@ -9,6 +9,7 @@ import javax.swing.InternalFrameFocusTraversalPolicy;
 
 import org.junit.Test;
 
+import br.ufla.naivetorrent.cli.ExtractCommand;
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.MetaInfoTorrent;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
