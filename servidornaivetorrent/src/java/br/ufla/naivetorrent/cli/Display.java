@@ -26,8 +26,9 @@ public class Display implements Runnable{
             
             try {
                 Runtime.getRuntime().exec("clear");  
-                Thread.sleep(5000);
+                
                 System.out.println("luiz");
+                Thread.sleep(5000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
             } catch (IOException ex) {
