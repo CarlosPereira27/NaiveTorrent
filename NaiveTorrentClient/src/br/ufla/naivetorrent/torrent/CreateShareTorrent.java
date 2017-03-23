@@ -23,7 +23,8 @@ public class CreateShareTorrent {
 		System.out.println(dir.getPath());
 		fileCreate = new File(fileCreate.getPath());
 		try {
-			if (dir.mkdirs() && fileCreate.createNewFile()) {
+			dir.mkdirs();
+			if (fileCreate.createNewFile()) {
 				return true;
 			}
 

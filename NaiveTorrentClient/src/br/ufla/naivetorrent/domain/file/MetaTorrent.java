@@ -27,7 +27,18 @@ public class MetaTorrent implements Serializable {
 		info = new MetaInfoTorrent();
 	}
 	
+	/**
+	 * Recupera tamanho do torrent.
+	 * @return tamanho do torrent
+	 */
+	public long getLenghtTorrent() {
+		return info.getLenghtTorrent();
+	}
 	
+	public Integer getPiecesLength() {
+		return info.getPiecesLength();
+	}
+
 	/**
 	 * Recupera a lista dos endereços dos trackers.
 	 * @return lista dos endereços dos trackers
