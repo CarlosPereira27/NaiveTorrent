@@ -2,6 +2,8 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+import javax.swing.InternalFrameFocusTraversalPolicy;
+
 import org.junit.Test;
 
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
@@ -41,7 +43,7 @@ public class TestFile {
 		a.add(mtf);
 		a.add(mtfb);
 		
-		info.setMetaFiles(a);		
+		info.setMetaFiles(a);
 		mt.setInfo(info);
 		st.setMetaTorrent(mt);
 		
