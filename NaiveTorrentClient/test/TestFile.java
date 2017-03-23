@@ -69,21 +69,24 @@ public class TestFile {
 	@Test
 	public void empty() throws IOException{
 		ShareTorrent st = new ShareTorrent();
-		st.setSharePathString("/home/carlos/");
-		File dir = new File("/home/carlos/teste12");
-		System.out.println(dir.mkdirs());
+		st.setSharePathString("/home/alcance/");
 		
 		MetaTorrent mt = new MetaTorrent();
 		
 		MetaInfoTorrent info = new MetaInfoTorrent();
+		
 		MetaFileTorrent mtf = new MetaFileTorrent();
 		mtf.setPathFile("/a.txt");
+		mtf.setLength(50l);
+		MetaFileTorrent mtfb = new MetaFileTorrent();		
+		mtfb.setPathFile("/B/b.txt");
+		mtfb.setLength(1024l);
 		
 		ArrayList<MetaFileTorrent> a = new ArrayList<MetaFileTorrent>();
 		a.add(mtf);
+		a.add(mtfb);
 		
-		info.setMetaFiles(a);
-		
+		info.setMetaFiles(a);		
 		mt.setInfo(info);
 		st.setMetaTorrent(mt);
 		

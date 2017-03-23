@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  * 
- * @author Sammy Guergachi <sguergachi at gmail.com>
+ * @
  */
 public class Display implements Runnable{
     
@@ -28,6 +28,8 @@ public class Display implements Runnable{
                 Runtime.getRuntime().exec("clear");  
                 
                 System.out.println("luiz");
+                
+                
                 Thread.sleep(5000);
             } catch (InterruptedException ex) {
                 Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);

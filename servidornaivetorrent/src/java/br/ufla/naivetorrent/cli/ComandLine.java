@@ -26,6 +26,14 @@ public class ComandLine implements Runnable {
     public static final String HELP = "help";
     public static final String QUIT = "quit";
     public static final String CMD = "cmd";
+    public static final String MENSAGEM_HELP = "# crete-torrent <conteudo-compartilhado> <arquivo-torrent> <lista-rastreadores> <(op)criador> <(op)comentário> <(op)codificação>\n"
+            + "# add-torrent <local-conteudo-compartilhado> <arquivo-torrent>\n"
+            + "# play <id-torrent>\n"
+            + "# pause <id-torrent>\n"
+            + "# remove-torrent <id-torrent>\n"
+            + "# list-torrent\n"
+            + "# help\n"
+            + "# quit\n";
 
     public String entrada;
 
@@ -131,29 +139,30 @@ public class ComandLine implements Runnable {
 
                     if (comandos[0].equals(CREATE_TORRENT)) {
                         
-                        System.out.print("cmd> ");
+                        
 
                     }
                     if (comandos[0].equals(ADD_TORRENT)) {
                             
-                        System.out.print("cmd> ");
+                        
                     }
                     if (comandos[0].equals(PLAY)) {
-                        System.out.print("cmd> ");
+                        
                     }
                     if (comandos[0].equals(PAUSE)) {
-                        System.out.print("cmd> ");
+                       
                     }
                     if (comandos[0].equals(REMOVE)) {
-                        System.out.print("cmd> ");
+                        
                     }
                     if (comandos[0].equals(LIST_TORRENT)) {
-                        System.out.print("cmd> ");
+                       
                     }
                     if (comandos[0].equals(HELP)) {
 
                         System.out.print("cmd> ");
                         System.out.println("List of all NaiveTorrent commands:");
+                         System.out.println(MENSAGEM_HELP);
 
                     }
 
@@ -166,7 +175,8 @@ public class ComandLine implements Runnable {
                     listagem.setAtiva(false);
                     System.out.print("help> ");
                     System.out.println("List of all NaiveTorrent commands:");
-                    System.out.println("\tcmd - comandos principais Naive torrent");
+                   
+                    System.out.println("#cmd - comandos principais Naive torrent");
                 try {
                     Thread.sleep(8000);
                 } catch (InterruptedException ex) {
