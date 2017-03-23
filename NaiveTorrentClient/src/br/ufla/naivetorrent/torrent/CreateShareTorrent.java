@@ -3,7 +3,9 @@ package br.ufla.naivetorrent.torrent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.ArrayList;
+import java.util.BitSet;
 
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
@@ -15,6 +17,12 @@ public class CreateShareTorrent {
 
 	public CreateShareTorrent(ShareTorrent share) {
 		this.share = share;
+		if(this.share.getMyBitfield() == null){
+			this.share.setMyBitfield(new BitSet());
+		}
+		if(this.share.getMyBitfield().isEmpty()){
+			this.share.setMyBitfield(new BitSet());
+		}
 	}
 
 	private boolean createSingleFile(String path) {
@@ -36,6 +44,8 @@ public class CreateShareTorrent {
 
 	public boolean createFiles() {
 		String directory = this.share.getSharePath().getPath();
+		BitSet myBitSet = null;
+		int size = 0;
 		//System.out.println(directory);
 		ArrayList<MetaFileTorrent> fields = (ArrayList<MetaFileTorrent>) share.getMetaTorrent().getInfo()
 				.getMetaFiles();
@@ -45,7 +55,14 @@ public class CreateShareTorrent {
 			String path = new String(directory + mt.getPathFile());
 			//System.out.println(path);
 			createSingleFile(path);
+			size += mt.getLength().intValue();
+			byte[] blankByte = new byte[mt.getLength().intValue()];
+			mt.setMd5sum(ByteBuffer.wrap(blankByte));
+			writePeace(path + PART_EXTENSION,blankByte);
 		}
+		myBitSet = new BitSet(size);
+		share.setMyBitfield(myBitSet);
+		System.out.println(share.getMyBitfield().size());
 		return true;
 	}
 
@@ -54,6 +71,7 @@ public class CreateShareTorrent {
 		try {
 			output = new FileOutputStream(path, true);
 			output.write(peaceByteArray);
+			output.flush();
 			output.close();
 			return true;
 		} catch (Exception e) {

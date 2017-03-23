@@ -32,8 +32,10 @@ public class TestFile {
 		
 		MetaFileTorrent mtf = new MetaFileTorrent();
 		mtf.setPathFile("/a.txt");
+		mtf.setLength(50l);
 		MetaFileTorrent mtfb = new MetaFileTorrent();		
 		mtfb.setPathFile("/B/b.txt");
+		mtfb.setLength(1024l);
 		
 		ArrayList<MetaFileTorrent> a = new ArrayList<MetaFileTorrent>();
 		a.add(mtf);
