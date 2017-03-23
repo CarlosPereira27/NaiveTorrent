@@ -7,6 +7,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.List;
 
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
@@ -23,10 +24,7 @@ public class CreateShareTorrent {
 		this.share = share;
 		if (this.share.getMyBitfield() == null) {
 			this.share.setMyBitfield(new BitSet());
-		}
-		if (this.share.getMyBitfield().isEmpty()) {
-			this.share.setMyBitfield(new BitSet());
-		}
+		}		
 	}
 
 	private boolean createSingleFile(File fileCreate) {
@@ -44,18 +42,15 @@ public class CreateShareTorrent {
 			System.out.println("Falha na criação de :" + path);
 			e.printStackTrace();
 		}
-		return false;
+		return true;
 	}
 
 	public boolean createFiles() {
 		String directory = this.share.getSharePath().getPath();
 		BitSet myBitSet = null;
-		int size = 0;
-		boolean exist = true;
 		// System.out.println(directory);
 		this.sizeMetaInfo = share.getMetaTorrent().getInfo().getPiecesLength();
-		ArrayList<MetaFileTorrent> fields = (ArrayList<MetaFileTorrent>) share.getMetaTorrent().getInfo()
-				.getMetaFiles();
+		List<MetaFileTorrent> fields = share.getMetaTorrent().getInfo().getMetaFiles();
 		// System.out.println(fields.size());
 		int i = 0;
 		for (MetaFileTorrent mt : fields) {
@@ -63,40 +58,41 @@ public class CreateShareTorrent {
 			String path = new String(directory + mt.getPathFile());
 			File fileFull = new File(path);
 
-			if (fileFull.exists()) {
-				fileFull.renameTo(new File(path + PART_EXTENSION));
-			}
+			// if (fileFull.exists()) {
+			// fileFull.renameTo(new File(path + PART_EXTENSION));
+			// }
 
 			File fileCreate = new File(path + PART_EXTENSION);
 
 			if (!fileCreate.exists()) {
-				exist = false;
-				// System.out.println(path);
+				System.out.println(path);
 				createSingleFile(fileCreate);
-				size += mt.getLength().intValue();
-				byte[] blankByte = new byte[mt.getLength().intValue()];
-				mt.setMd5sum(ByteBuffer.wrap(blankByte));
-				writeFile(path, mt.getLength().intValue());
+				writeFile(path + PART_EXTENSION, mt.getLength());
 				// writePeace(path + PART_EXTENSION, blankByte);
 			} else {
 				readFile(fileCreate, i);
 			}
 			i++;
 		}
-		if (!exist) {
-			myBitSet = new BitSet(size);
-			share.setMyBitfield(myBitSet);
-			System.out.println(share.getMyBitfield().size());
+		long peaceSize = (long) share.getMetaTorrent().getInfo().getPiecesLength();
+		long torrentSize = share.getMetaTorrent().getInfo().getLenghtTorrent();
+		int size = (int) (torrentSize / peaceSize);
+		if (torrentSize % peaceSize != 0) {
+			size++;
 		}
+		myBitSet = new BitSet(size);
+		share.setMyBitfield(myBitSet);
+		System.out.println(share.getMyBitfield().size());
+
 		return true;
 	}
 
 	private void writeFile(String path, long sizeFile) {
 		long i;
-		for (i = 0l; i < sizeFile; i += sizeMetaInfo) {
+		for (i = 0l; i +  sizeMetaInfo < sizeFile; i += sizeMetaInfo) {
 			writePeace(path, new byte[sizeMetaInfo]);
 		}
-		writePeace(path, new byte[(int) (sizeFile - i - sizeMetaInfo)]);
+		writePeace(path, new byte[(int) (sizeFile - i)]);
 	}
 
 	private boolean writePeace(String path, byte[] peaceByteArray) {
