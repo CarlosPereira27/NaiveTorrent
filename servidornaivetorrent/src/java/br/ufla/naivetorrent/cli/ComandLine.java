@@ -40,35 +40,71 @@ public class ComandLine  implements Runnable{
         commands.add(LIST_TORRENT);
         commands.add(HELP);
         commands.add(QUIT);
-        commands.add(CMD);
+        //commands.add(CMD);
         return commands;
     }
     
-    public static boolean isValidCommand(String cmd) {
-        List<String> commands = commands();
-        for (String strCmd : commands) {
-            if (strCmd.equals(cmd)) {
-                return true;
+    public static boolean isValidCommand(String[] cmd) {
+        
+        
+        if(cmd.length!=0){
+        //List<String> commands = commands();
+        
+        String strCmd = cmd[0];
+            
+            
+            if (strCmd.equals(cmd[0])) {
+                
+                if(strCmd.equals(CREATE_TORRENT) && cmd.length >=3){
+                    return true;
+                }
+                if(strCmd.equals(ADD_TORRENT) && cmd.length ==3){
+                    return true;
+                }
+                if(strCmd.equals(PLAY) && cmd.length ==2){
+                    return true;
+                }
+                if(strCmd.equals(PAUSE) && cmd.length ==2){
+                    return true;
+                }
+                if(strCmd.equals(REMOVE) && cmd.length ==2){
+                    return true;
+                }
+                if(strCmd.equals(LIST_TORRENT) && cmd.length ==1){
+                    return true;
+                }
+                if(strCmd.equals(HELP) && cmd.length ==1){
+                    return true;
+                }
+                if(strCmd.equals(QUIT) && cmd.length ==1){
+                    return true;
+                }
+                
             }
+            
         }
+        
         return false;
     }
 
     @Override
     public void run() {
-        boolean controle;
         
+         String[] comandos;
+         Display listagem;
+         
         while(true){
         
-            String[] comandos;
-            Display listagem = new Display();
+           
+            listagem= new Display();
+            
             display = new Thread(listagem);
+            
             display.start();
 
             Scanner leitor = new Scanner(System.in);
 
             entrada = leitor.nextLine();
-
 
             comandos = entrada.split(" ");
 
@@ -77,42 +113,71 @@ public class ComandLine  implements Runnable{
                 entrada = leitor.nextLine();
 
             }
+            comandos = entrada.split(" ");
+            
             if(comandos[0].equals(CMD)){
                 
+                System.out.println("entrou");
                 //matamos a thread
                 listagem.setAtiva(false);
-                controle = true;
+                
+            
                 entrada = leitor.nextLine();
+                
                 
                 comandos = entrada.split(" ");
                 
+                while(!isValidCommand(comandos)){
+                    
+                    entrada = leitor.nextLine();
+                    comandos = entrada.split(" ");
+                }
                 
-                
-                while(controle){
+                if(comandos[0].equals(CREATE_TORRENT)){
+                    
+                }
+                if(comandos[0].equals(ADD_TORRENT)){
+                    
+                }
+                if(comandos[0].equals(PLAY)){
+                    
+                }
+                if(comandos[0].equals(PAUSE)){
+                    
+                }
+                if(comandos[0].equals(REMOVE)){
+                    
+                }
+                if(comandos[0].equals(LIST_TORRENT)){
+                    
+                }
+                if(comandos[0].equals(HELP)){
+                    System.out.println("List of all NaiveTorrent commands:");
+                    entrada = leitor.nextLine();
+                    comandos = entrada.split(" ");
                     
                     
-                    if(comandos[0].equals(ADD_TORRENT))
-                        !comandos[0].equals(CREATE_TORRENT)
-                        !comandos[0].equals(PLAY)
-                        !comandos[0].equals(PAUSE)
-                        !comandos[0].equals(REMOVE)
-                        !comandos[0].equals(LIST_TORRENT)
-                        !comandos[0].equals(HELP)
-                        !comandos[0].equals(QUIT)
-                    
-                    
-                    
+                }while(comandos[0].equals(HELP)){
+                        entrada = leitor.nextLine();
+                        comandos = entrada.split(" ");
+                    }
+                if(comandos[0].equals(QUIT)){
                     
                 }
                 
-       
                 
-            }
-        
-        
-        
+             }
+            else if(comandos[0].equals(HELP)){
+                 listagem.setAtiva(false);
+                 while(comandos[0].equals(HELP)){
+                     System.out.println("List of all NaiveTorrent commands:");
+                        entrada = leitor.nextLine();
+                        comandos = entrada.split(" ");
+                    }
+                
+                    
+             }
+            }   
         
         }
     }
-
-}

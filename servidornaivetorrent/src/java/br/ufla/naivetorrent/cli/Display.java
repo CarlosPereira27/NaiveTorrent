@@ -6,6 +6,11 @@
 
 package br.ufla.naivetorrent.cli;
 
+import java.io.IOException;
+import static java.lang.Thread.sleep;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * 
  * @author Sammy Guergachi <sguergachi at gmail.com>
@@ -18,7 +23,16 @@ public class Display implements Runnable{
     public void run() {
         
         while(isAtiva()){
-            System.out.println("luiz");
+            
+            try {
+                Runtime.getRuntime().exec("clear");  
+                Thread.sleep(5000);
+                System.out.println("luiz");
+            } catch (InterruptedException ex) {
+                Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (IOException ex) {
+                Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
         
     }
@@ -31,4 +45,5 @@ public class Display implements Runnable{
         this.ativa = ativa;
     }
     
+
 }
