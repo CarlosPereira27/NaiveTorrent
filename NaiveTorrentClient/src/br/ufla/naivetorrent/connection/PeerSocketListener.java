@@ -16,6 +16,7 @@ public class PeerSocketListener implements Runnable {
 
 	public final static int MAX_CONNECTIONS = 15;
 	public final static long TIME_VERIFY = 90000;
+	@SuppressWarnings("unused")
 	private Peer me;
 	private ServerSocket serverSocket;
 	private Map<ByteBuffer, ShareTorrent> idToShareTorrent;

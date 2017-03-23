@@ -7,7 +7,6 @@ import java.math.BigInteger;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.Arrays;
 import java.util.BitSet;
 
 import br.ufla.naivetorrent.connection.PairedConnection;

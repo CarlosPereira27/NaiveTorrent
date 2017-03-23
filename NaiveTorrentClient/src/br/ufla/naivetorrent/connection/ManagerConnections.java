@@ -7,6 +7,7 @@ import br.ufla.naivetorrent.domain.peer.Peer;
 
 public class ManagerConnections {
 	
+	@SuppressWarnings("unused")
 	private PeerSocketListener listener;
 	private ShareTorrent shareTorrent;
 	private Map<Peer, PairedConnection> connections;

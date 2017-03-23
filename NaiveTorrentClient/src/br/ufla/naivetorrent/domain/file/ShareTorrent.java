@@ -29,6 +29,7 @@ public class ShareTorrent {
 		
 	}
 	
+	@SuppressWarnings("unused")
 	private ManagerConnections managerConnections;
 	private Peer me;
 	private DownloadStrategy downloadStrategy;
@@ -128,6 +129,7 @@ public class ShareTorrent {
 		return fileIsCompleted.get(metaFile);
 	}
 	
+	@SuppressWarnings("unused")
 	private void init() {
 		
 	}

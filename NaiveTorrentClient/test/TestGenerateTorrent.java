@@ -3,7 +3,6 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
@@ -78,6 +77,8 @@ public class TestGenerateTorrent {
 		createTorrent.create();
 		ReadTorrent readTorrent = new ReadTorrent(torrentFile);
 		MetaTorrent metaTorrentRead = readTorrent.read();
+		
+		// VERIFICAO
 		assertEquals(metaTorrentCreated, metaTorrentRead);
 	}
 	

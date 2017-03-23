@@ -18,6 +18,7 @@ public class PairedConnection implements Runnable {
 	
 	private ShareTorrent shareTorrent;
 	private Peer peer;
+	@SuppressWarnings("unused")
 	private Socket mySocket;
 	private OutputStream myOutputStream;
 	private InputStream mySocketInput;

@@ -29,6 +29,7 @@ public class TestSecurity {
 		messageDigest.update("d".getBytes());
 		byte result[] = messageDigest.digest();
 		
+		// VERIFICAO
 		assertArrayEquals(expected, result);
 	}
 	
@@ -52,6 +53,7 @@ public class TestSecurity {
 		messageDigest.update("d".getBytes());
 		byte result[] = messageDigest.digest();
 		
+		// VERIFICAO
 		assertArrayEquals(expected, result);
 	}
 

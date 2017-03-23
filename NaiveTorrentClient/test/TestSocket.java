@@ -3,18 +3,14 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.net.UnknownHostException;
-import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Random;
 
-import org.junit.Test;
 
 import br.ufla.naivetorrent.util.UtilByteString;
 
+@SuppressWarnings("unused")
 public class TestSocket {
 	
 	public static String generateString() {

@@ -3,31 +3,13 @@ import static org.junit.Assert.*;
 import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Arrays;
 
 import org.junit.Test;
 
 import br.ufla.naivetorrent.util.UtilHex;
 
 public class TestBytesToHex {
-	
-	@SuppressWarnings("unused")
-	private String toString(byte bytes[]) {
-		byte bytesCp[] = Arrays.copyOf(bytes, bytes.length);
-		StringBuilder sb = new StringBuilder();
-		int n = bytes.length;
-		for (int i = 0; i < n; i++) {
-			for (int j = 0; j < 8; j++) {
-				if ((int) (bytesCp[i] & -128) == -128) {
-					sb.append('1');
-				} else {
-					sb.append('0');
-				}
-				bytesCp[i] = (byte) (bytesCp[i] << 1);
-			}
-		}
-		return sb.toString();
-	}
+
 	
 	@Test
 	public void testBytesToHex() throws NoSuchAlgorithmException {
@@ -38,6 +20,7 @@ public class TestBytesToHex {
 		String hexExpected = "2AAE6C35C94FCFB415DBE95F408B9CE91EE846ED";
 		String hexResult = UtilHex.toHexString(ByteBuffer.wrap(result));
 
+		// VERIFICAO
 		assertEquals(hexExpected, hexResult);
 		
 	}
@@ -52,6 +35,7 @@ public class TestBytesToHex {
 		
 		byte result[] = UtilHex.toBytes(hexString).array();
 
+		// VERIFICAO
 		assertArrayEquals(expected, result);
 		
 	}

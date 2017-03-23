@@ -1,11 +1,7 @@
-import java.io.File;
 import java.io.IOException;
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.swing.InternalFrameFocusTraversalPolicy;
 
 import org.junit.Test;
 
@@ -26,21 +22,6 @@ public class TestFile {
 		dir.mkdirs();
 		//System.out.println(file.createNewFile());
 	}*/
-	
-	private int index = 0;
-	
-
-	@Test
-	public void test2() {
-		byte b[] = new byte[4];
-		b[2] = 39;
-		b[3] = 18;
-		System.out.println(10002);
-		byte c[] = BigInteger.valueOf(10002).toByteArray();
-		System.out.println(Arrays.toString(c));
-		System.out.println(Arrays.toString(b));
-		System.out.println(new BigInteger(b).intValue());
-	}
 	
 
 	

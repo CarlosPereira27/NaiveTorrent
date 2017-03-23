@@ -4,21 +4,15 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.net.URL;
-import java.nio.ByteBuffer;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Random;
 
-import javax.rmi.CORBA.Util;
-import javax.xml.ws.handler.MessageContext;
-
 import org.junit.Test;
 
 import br.ufla.naivetorrent.domain.tracker.Tracker;
-import br.ufla.naivetorrent.tracker.protocol.RequestEvent;
 import br.ufla.naivetorrent.tracker.protocol.RequestMessage;
 import br.ufla.naivetorrent.tracker.request.HttpRequest;
-import br.ufla.naivetorrent.util.UtilHex;
 
 public class TestHttpRequest {
 
@@ -43,8 +37,6 @@ public class TestHttpRequest {
 			while ((inputLine = in.readLine()) != null) {
 				sbResponse.append(inputLine);
 			}
-			//System.out.println("######");
-			//System.out.println(sbResponse.toString());
 			in.close();
 		} else {
 			

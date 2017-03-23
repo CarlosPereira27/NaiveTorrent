@@ -1,6 +1,5 @@
 package br.ufla.naivetorrent;
 
-import javax.activation.CommandInfo;
 
 import br.ufla.naivetorrent.cli.CommandLine;
 
