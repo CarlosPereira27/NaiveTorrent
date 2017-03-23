@@ -29,14 +29,17 @@ public class TestFile {
 		MetaTorrent mt = new MetaTorrent();
 		
 		MetaInfoTorrent info = new MetaInfoTorrent();
+		
 		MetaFileTorrent mtf = new MetaFileTorrent();
 		mtf.setPathFile("/a.txt");
+		MetaFileTorrent mtfb = new MetaFileTorrent();		
+		mtfb.setPathFile("/B/b.txt");
 		
 		ArrayList<MetaFileTorrent> a = new ArrayList<MetaFileTorrent>();
 		a.add(mtf);
+		a.add(mtfb);
 		
-		info.setMetaFiles(a);
-		
+		info.setMetaFiles(a);		
 		mt.setInfo(info);
 		st.setMetaTorrent(mt);
 		
