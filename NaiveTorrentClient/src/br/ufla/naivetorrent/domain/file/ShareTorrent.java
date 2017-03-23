@@ -9,15 +9,31 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import br.ufla.naivetorrent.connection.ManagerConnections;
 import br.ufla.naivetorrent.domain.peer.Peer;
 import br.ufla.naivetorrent.peer.protocol.DownloadStrategy;
 import br.ufla.naivetorrent.util.UtilByteString;
 
 public class ShareTorrent {
 	
+	public static final int MAX_DOWNLOADING = 8;
+	
+	class SimpleManagerConnection implements Runnable {
+
+		@Override
+		public void run() {
+			while (true) {
+				if (onDonwloading )
+			}
+			
+		}
+		
+	}
+	
+	private ManagerConnections managerConnections;
 	private Peer me;
 	private DownloadStrategy downloadStrategy;
-	private List<Integer> rarestPieces;
+	private List<Integer> nextDownloadPieces;
 	private List<Integer> onDonwloading;
 	private Map<MetaFileTorrent, Boolean> fileIsCompleted;
 	private Map<MetaFileTorrent, FileLimits> fileToLimits;
@@ -33,6 +49,15 @@ public class ShareTorrent {
 	private File sharePath;
 	private boolean pause;
 	private boolean seeder;
+	
+	public void getMoreRarestPieces() {
+		synchronized (nextDownloadPieces) {
+			nextDownloadPieces.addAll(downloadStrategy.getPieces());
+		}
+	}
+	
+	public void set
+	
 	
 	public ShareTorrent() {
 		fileToLimits = new LinkedHashMap<>();
@@ -85,8 +110,8 @@ public class ShareTorrent {
 		synchronized (onDonwloading) {
 			onDonwloading.remove(index);
 		}
-		synchronized (rarestPieces) {
-			rarestPieces.add(index);
+		synchronized (nextDownloadPieces) {
+			nextDownloadPieces.add(index);
 		}
 	}
 	

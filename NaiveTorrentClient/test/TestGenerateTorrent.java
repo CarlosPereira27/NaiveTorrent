@@ -3,14 +3,17 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
+import java.nio.charset.Charset;
 import java.util.Arrays;
 
 import org.junit.Test;
 
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
+import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
 import br.ufla.naivetorrent.torrent.ExtractMetaInfo;
 import br.ufla.naivetorrent.torrent.ReadTorrent;
+import br.ufla.naivetorrent.torrent.CreateShareTorrent;
 import br.ufla.naivetorrent.torrent.CreateTorrent;
 
 public class TestGenerateTorrent {
@@ -33,6 +36,7 @@ public class TestGenerateTorrent {
 		File shareFile = new File("/home/carlos/workspaceTorrent/NaiveTorrent/"
 				+ "NaiveTorrentClient");
 		File torrentFile = new File("/home/carlos/naiveTorrent.torrent");
+		torrentFile.createNewFile();
 		ExtractMetaInfo extractMetaInfo = new ExtractMetaInfo(shareFile);
 		extractMetaInfo.setCreatedBy("Carlos Henrique Pereira");
 		extractMetaInfo.setComment("hello world");
@@ -45,6 +49,7 @@ public class TestGenerateTorrent {
 		tracker3.setSocketAddressListening(new InetSocketAddress("192.168.0.101", 8080));
 		extractMetaInfo.setTrackers(Arrays.asList(tracker1, tracker2, tracker3));
 		MetaTorrent metaTorrent = extractMetaInfo.generateMetaTorrent();
+		System.out.println(metaTorrent);
 		CreateTorrent makeTorrent = new CreateTorrent(metaTorrent, torrentFile);
 		makeTorrent.create();
 
@@ -75,5 +80,22 @@ public class TestGenerateTorrent {
 		MetaTorrent metaTorrentRead = readTorrent.read();
 		assertEquals(metaTorrentCreated, metaTorrentRead);
 	}
+	
+	@Test
+	public void readAndWriteMetaTorrent() throws IOException{
+		File torrentFile = new File("/home/carlos/naiveTorrent.torrent");
+		ReadTorrent readTorrent = new ReadTorrent(torrentFile);
+		MetaTorrent metaTorrentRead = readTorrent.read();
+		
+		System.out.println(metaTorrentRead.getInfo());
+		
+		ShareTorrent share = new ShareTorrent();
+		share.setMetaTorrent(metaTorrentRead);
+		share.setSharePath(new File("/home/carlos/Documentos/"));
+		
+		CreateShareTorrent cs = new CreateShareTorrent(share);
+		cs.createFiles();
+	}
+
 
 }

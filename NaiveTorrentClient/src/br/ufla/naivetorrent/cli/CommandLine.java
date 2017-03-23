@@ -25,6 +25,16 @@ public class CommandLine implements Runnable {
 	public static final String HELP = "help";
 	public static final String QUIT = "quit";
 	public static final String CMD = "cmd";
+    public static final String MENSAGEM_HELP = 
+    		"# crete-torrent <conteudo-compartilhado> <arquivo-torrent> <lista-rastreadores> "
+    		+ "<(op)criador> <(op)comentário> <(op)codificação>\n"
+            + "# add-torrent <local-conteudo-compartilhado> <arquivo-torrent>\n"
+            + "# play <id-torrent>\n"
+            + "# pause <id-torrent>\n"
+            + "# remove-torrent <id-torrent>\n"
+            + "# list-torrent\n"
+            + "# help\n"
+            + "# quit\n";
 
 	private Thread displayThread;
 	private Scanner scanner;
@@ -118,15 +128,16 @@ public class CommandLine implements Runnable {
 							|| commandTokens[0].equals(QUIT)
 							|| commandTokens[0].equals(HELP)));
 			if (commandTokens[0].equals(CMD)) {
-				System.out.println("entrou");
 				display.setAtiva(false);
 				ConsoleClear.clear();
 				System.out.println("Modo de comando: digite 'help' para conseguir ajuda.");
 				do {
+					System.out.print("cmd> ");
 					nextCommandTokens();
-					while (!isValidCommand()) {
+					while (!isValidCommand()) { 
 						System.out.println("Comando inválido, entrei com 'help' "
 								+ "para conseguir ajuda!");
+						System.out.print("cmd> ");
 						nextCommandTokens();
 					}
 					switch(commandTokens[0]) {
@@ -149,13 +160,14 @@ public class CommandLine implements Runnable {
 						
 						break;
 					case HELP:
-						System.out.println("List of all NaiveTorrent commands:");
+						System.out.println(MENSAGEM_HELP);
 						break;
 					}
 				} while (!commandTokens[0].equals(QUIT));
 			} else if (commandTokens[0].equals(HELP)) {
 				display.setAtiva(false);
-				System.out.println("List of all NaiveTorrent commands:");
+				 System.out.print("help> ");
+				 System.out.println("#cmd - comandos principais NaiveTorrent");
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {

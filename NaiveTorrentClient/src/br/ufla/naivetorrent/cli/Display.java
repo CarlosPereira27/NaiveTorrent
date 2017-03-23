@@ -22,9 +22,11 @@ public class Display implements Runnable {
 		ConsoleClear.clear();
 		while (isAtiva()) {
 			try {
-				System.out.println("luiz");
+				System.out.println("DISPLAY DADOS");
 				Thread.sleep(3000);
-				ConsoleClear.clear();
+				if (isAtiva()) {
+					ConsoleClear.clear();
+				}
 			} catch (InterruptedException ex) {
 				System.out.println(ex.getMessage());
 				Logger.getLogger(Display.class.getName()).log(Level.SEVERE, null, ex);

@@ -34,6 +34,10 @@ public class PairedConnection implements Runnable {
 		myOutputStream = mySocket.getOutputStream();
 	}
 	
+	public Peer getPeer() {
+		return peer;
+	}
+	
 	/**
 	 * Realiza a copia dos bytes de um array de bytes para um buffer de dados em um 
 	 * determinado índice.
