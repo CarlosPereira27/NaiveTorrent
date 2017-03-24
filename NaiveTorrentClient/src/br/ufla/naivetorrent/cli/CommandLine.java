@@ -216,6 +216,9 @@ public class CommandLine implements Runnable {
 		if (strCmd.equals(QUIT) && commandLength == 1) {
 			return true;
 		}
+		if (strCmd.equals(CLEAR) && commandLength == 1) {
+			return true;
+		}
 		return false;
 	}
 	
@@ -274,11 +277,12 @@ public class CommandLine implements Runnable {
 			CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated,
 					torrentFile);
 			createTorrent.create();
+			System.out.println("\033[1;32mArquivo .torrent foi criado com sucesso!\033[1;97m");
 		} catch (Exception e) {
-			System.err.println(e.getMessage());
-			e.printStackTrace();
+			System.err.println("\033[1;31m" + e.getMessage() + "\033[1;97m");
+			//e.printStackTrace();
 		}
-		System.out.println("\033[1;32mArquivo .torrent foi criado com sucesso!\033[1;97m");
+		
 	}
 	
 	private void addTorrentCmd() {
