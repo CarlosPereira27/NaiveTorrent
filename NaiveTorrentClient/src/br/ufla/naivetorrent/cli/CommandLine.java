@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import br.ufla.naivetorrent.cli.console.Console;
+import br.ufla.naivetorrent.cli.console.ConsoleForegroundColors;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
@@ -36,36 +38,35 @@ public class CommandLine implements Runnable {
 	public static final String QUIT = "quit";
 	public static final String CMD = "cmd";
 	public static final String CLEAR = "clear";
-    public static final String MENSAGEM_HELP = 
-    		"# crete-torrent <conteudo-compartilhado> <arquivo-torrent> <lista-rastreadores> "
-    		+ "<(op)criador> <(op)comentário> <(op)codificação>\n"
-            + "# add-torrent <local-conteudo-compartilhado> <arquivo-torrent>\n"
-            + "# play <id-torrent>\n"
-            + "# pause <id-torrent>\n"
-            + "# remove-torrent <id-torrent>\n"
-            + "# list-torrent\n"
-            + "# help\n"
-            + "# quit\n";
+	public static final String MENSAGEM_HELP = 
+			"# crete-torrent <conteudo-compartilhado> <arquivo-torrent> <lista-rastreadores> "
+			+ "<(op)criador> <(op)comentário> <(op)codificação>\n"
+			+ "# add-torrent <local-conteudo-compartilhado> <arquivo-torrent>\n" 
+			+ "# play <id-torrent>\n"
+			+ "# pause <id-torrent>\n" + "# remove-torrent <id-torrent>\n" 
+			+ "# list-torrent\n" 
+			+ "# help\n"
+			+ "# quit\n";
 	private static final String WELCOME_TXT = 
-			"--------------------------\n"
-			+ "Bem vindo ao NaiveTorrent!\n"
+			"--------------------------\n" 
+			+ Console.BOLD.getValue()
+			+ ConsoleForegroundColors.LIGHT_BLUE.getValue()
+			+ "Bem vindo ao NaiveTorrent!\n" 
+			+ Console.DEFAULT.getValue()
 			+ "--------------------------\n"
 			+ "Um software para compartilhamento de arquivos em redes peer-to-peer que usa\n"
-			+ "um protocolo de comunicação baseado no BitTorrent."
-			+ "\n"
-			+ "\n"
-			+ "\n"
-			+ "\n"
-			+ "Desenvolvido por Carlos Pereira\n"
+			+ "um protocolo de comunicação baseado no BitTorrent." 
+			+ "\n\n\n\n"
+			+ "Desenvolvido por Carlos Pereira\n" 
 			+ "                 Daniel Borges\n"
-			+ "                 Gabriel Rodriguez\n"
+			+ "                 Gabriel Rodriguez\n" 
 			+ "                 Luiz Felipe\n";
 
 	private Thread displayThread;
 	private Scanner scanner;
 	private String[] commandTokens;
 	private List<ShareTorrent> shareTorrents;
-	
+
 	public CommandLine() {
 		scanner = new Scanner(System.in);
 		shareTorrents = new ArrayList<>();
@@ -73,6 +74,7 @@ public class CommandLine implements Runnable {
 
 	/**
 	 * Recupera a lista de comandos.
+	 * 
 	 * @return lista de comandos
 	 */
 	@SuppressWarnings("unused")
@@ -89,46 +91,42 @@ public class CommandLine implements Runnable {
 		commands.add(CMD);
 		return commands;
 	}
-	
 
 	@Override
 	public void run() {
-		ConsoleClear.clear();
+		Console.CLEAR_HOME.apply();
 		System.out.println(WELCOME_TXT);
-		
+
 		createOrRecoveryDatabase();
-		
+
 		Display display = new Display(shareTorrents);
 		try {
 			Thread.sleep(3000);
 		} catch (InterruptedException e1) {
 			e1.printStackTrace();
 		}
-		ConsoleClear.clear();
+		Console.CLEAR_HOME.apply();
 		while (true) {
 			display.setAtiva(true);
 			displayThread = new Thread(display);
 			displayThread.start();
 			do {
 				nextCommandTokens();
-			} while (commandTokens.length != 1 && 
-					!(commandTokens[0].equals(CMD) 
-							|| commandTokens[0].equals(QUIT)
-							|| commandTokens[0].equals(HELP)));
+			} while (commandTokens.length != 1 && !(commandTokens[0].equals(CMD) || commandTokens[0].equals(QUIT)
+					|| commandTokens[0].equals(HELP)));
 			if (commandTokens[0].equals(CMD)) {
 				display.setAtiva(false);
-				ConsoleClear.clear();
+				Console.CLEAR_HOME.apply();
 				System.out.println("Modo de comando: digite 'help' para conseguir ajuda.");
 				do {
 					System.out.print("cmd> ");
 					nextCommandTokens();
-					while (!isValidCommand()) { 
-						System.out.println("Comando inválido, entrei com 'help' "
-								+ "para conseguir ajuda!");
+					while (!isValidCommand()) {
+						System.out.println("Comando inválido, entrei com 'help' " + "para conseguir ajuda!");
 						System.out.print("cmd> ");
 						nextCommandTokens();
 					}
-					switch(commandTokens[0]) {
+					switch (commandTokens[0]) {
 					case CREATE_TORRENT:
 						createTorrentCmd();
 						break;
@@ -151,14 +149,14 @@ public class CommandLine implements Runnable {
 						System.out.println(MENSAGEM_HELP);
 						break;
 					case CLEAR:
-						ConsoleClear.clear();
+						Console.CLEAR_HOME.apply();
 						break;
 					}
 				} while (!commandTokens[0].equals(QUIT));
 			} else if (commandTokens[0].equals(HELP)) {
 				display.setAtiva(false);
-				 System.out.print("help> ");
-				 System.out.println("#cmd - comandos principais NaiveTorrent");
+				System.out.print("help> ");
+				System.out.println("#cmd - comandos principais NaiveTorrent");
 				try {
 					Thread.sleep(3000);
 				} catch (InterruptedException e) {
@@ -168,7 +166,7 @@ public class CommandLine implements Runnable {
 			}
 		}
 	}
-	
+
 	private void createOrRecoveryDatabase() {
 		try {
 			CreateDatabase createDatabase = new CreateDatabase();
@@ -178,12 +176,12 @@ public class CommandLine implements Runnable {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-		
-		
+
 	}
-	
+
 	/**
 	 * Verifica se o comando atual é válido.
+	 * 
 	 * @return true se o comando é válido, caso contrário false
 	 */
 	private boolean isValidCommand() {
@@ -221,7 +219,7 @@ public class CommandLine implements Runnable {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Lê o próximo comando e gera os tokens
 	 */
@@ -236,7 +234,7 @@ public class CommandLine implements Runnable {
 		commandTokens = new String[cleanTokens.size()];
 		commandTokens = cleanTokens.toArray(commandTokens);
 	}
-	
+
 	private List<Tracker> decodeTrackersStr(List<String> trackersStr) {
 		List<Tracker> trackers = new ArrayList<>();
 		for (String trackerStr : trackersStr) {
@@ -246,7 +244,7 @@ public class CommandLine implements Runnable {
 		}
 		return trackers;
 	}
-	
+
 	/**
 	 * Realiza o procedimento do comando de criar um torrent.
 	 */
@@ -261,57 +259,63 @@ public class CommandLine implements Runnable {
 			String createdBy = extractCommand.readParameter();
 			String comment = extractCommand.readParameter();
 			String encoding = extractCommand.readParameter();
-			
+
 			File shareFile = new File(sharePath);
 			File torrentFile = new File(torrentPath);
 			torrentFile.createNewFile();
 			List<Tracker> trackers = decodeTrackersStr(trackersStr);
-			
+
 			ExtractMetaInfo extractMetaInfo = new ExtractMetaInfo(shareFile);
 			extractMetaInfo.setCreatedBy(createdBy);
 			extractMetaInfo.setComment(comment);
 			extractMetaInfo.setEncoding(encoding);
 			extractMetaInfo.setTrackers(trackers);
-			
+
 			MetaTorrent metaTorrentCreated = extractMetaInfo.generateMetaTorrent();
-			CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated,
-					torrentFile);
+			CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated, torrentFile);
 			createTorrent.create();
-			System.out.println("\033[1;32mArquivo .torrent foi criado com sucesso!\033[1;97m");
+			System.out.println(
+					ConsoleForegroundColors.GREEN.getValue()
+					+ "Arquivo .torrent foi criado com sucesso!"
+					+ Console.DEFAULT.getValue());
 		} catch (Exception e) {
-			System.err.println("\033[1;31m" + e.getMessage() + "\033[1;97m");
-			//e.printStackTrace();
+			System.err.println(
+					ConsoleForegroundColors.RED.getValue()
+					+ e.getMessage() 
+					+ Console.DEFAULT.getValue());
+			// e.printStackTrace();
 		}
-		
+
 	}
-	
+
 	private void addTorrentCmd() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private void playTorrentCmd() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private void pauseTorrentCmd() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private void removeTorrentCmd() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	private void listTorrentCmd() {
 		// TODO Auto-generated method stub
-		
+
 	}
-	
+
 	/**
 	 * Teste
+	 * 
 	 * @param args
 	 */
 	public static void main(String[] args) {

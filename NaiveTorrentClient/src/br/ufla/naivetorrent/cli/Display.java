@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import br.ufla.naivetorrent.cli.console.Console;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 
 /**
@@ -48,13 +49,13 @@ public class Display implements Runnable {
 
 	@Override
 	public void run() {
-		ConsoleClear.clear();
+		Console.CLEAR_HOME.apply();
 		while (isAtiva()) {
 			try {
 				displayData();
 				Thread.sleep(3000);
 				if (isAtiva()) {
-					ConsoleClear.clear();
+					Console.CLEAR_HOME.apply();
 				}
 			} catch (InterruptedException ex) {
 				System.out.println(ex.getMessage());
