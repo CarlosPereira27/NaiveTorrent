@@ -41,7 +41,9 @@ public class ExtractCommand {
 	public String readCmd() 
 			throws Exception {
 		if (index != 0) {
-			throw new Exception("Somente deve ler o comando uma vez, no início");
+			throw new Exception(
+					"Erro! Somente deve ler o comando uma vez, no início."
+					);
 		}
 		return tokens[index++];
 	}
@@ -54,17 +56,19 @@ public class ExtractCommand {
 	public String readParameter() 
 			throws Exception  {
 		// não possui parâmetro
-		if (index > tokens.length) {
+		if (index >= tokens.length) {
 			return null;
 		}
 		// parâmetro incorreto
 		if (!firstIndexIs(tokens[index], '\"')) {
-			throw new Exception("Parâmetro incorreto! Parâmetro deve começar com '\"'.");
+			throw new Exception(
+					"Erro! Parâmetro incorreto! Parâmetro deve começar com '\"'."
+					);
 		}
 		// apenas um token
 		if (lastIndexIs(tokens[index], '\"')) {
 			index++;
-			return tokens[index-1].substring(1, tokens[index-1].length()-1);
+			return tokens[index-1].substring(1, tokens[index-1].length()-1).trim();
 		}
 		String parameter = tokens[index++].substring(1);
 		int length = tokens.length;
@@ -72,12 +76,16 @@ public class ExtractCommand {
 			parameter += " " + tokens[index++];
 		}
 		if (index == length) {
-			throw new Exception("Parâmetro incorreto (" + parameter + ")!" 
-					+ "\nParâmetro deve terminar com '\"'.");
+			throw new Exception(
+					"Erro! Parâmetro incorreto ('" 
+					+ parameter 
+					+ "')!\n" 
+					+ "Parâmetro deve terminar com '\"'."
+							);
 		}
 		parameter += " " + tokens[index].substring(0, tokens[index].length()-1);
 		index++;
-		return parameter;
+		return parameter.trim();
 	}
 	
 	/**
@@ -107,36 +115,43 @@ public class ExtractCommand {
 	 */
 	public List<String> readList() 
 			throws Exception  {
+		if (index >= tokens.length) {
+			return null;
+		}
 		List<String> list = new ArrayList<>();
 		if (!firstIndexIs(tokens[index], '{')) {
-			throw new Exception("Lista de parâmetros incorreta!\n"
-					+ "Lista deve começar com o caractere '{'.");
+			throw new Exception(
+					"Erro! Lista de parâmetros incorreta!\n"
+					+ "Lista deve começar com o caractere '{'."
+							);
 		}
 		if (tokens[index].length() == 1) {
 			index++;
 		} else if (lastIndexIs(tokens[index], '}')) { //Apenas um elemento
-			list.add(tokens[index].substring(1, tokens[index].length()-1));
+			list.add(tokens[index].substring(1, tokens[index].length()-1).trim());
 			index++;
 			return list;
 		} else {
-			list.add(tokens[index].substring(1));
+			list.add(tokens[index].substring(1).trim());
 			index++;
 		}
 		int n = tokens.length;
 		while (index < n && !lastIndexIs(tokens[index], '}')) {
 			if (lastIndexIs(tokens[index], ',')) {
-				list.add(tokens[index].substring(0, tokens[index].length()-1));
+				list.add(tokens[index].substring(0, tokens[index].length()-1).trim());
 			} else {
-				list.add(tokens[index]);
+				list.add(tokens[index].trim());
 			}
 			index++;
 		}
 		if (index == n) {
-			throw new Exception("Lista de parâmetros incorreta!\n"
-					+ "Lista deve terminar com o caractere '}'.");
+			throw new Exception(
+					"Erro! Lista de parâmetros incorreta!\n"
+					+ "Lista deve terminar com o caractere '}'."
+							);
 		}
 		if (tokens[index].length() != 1) {
-			list.add(tokens[index].substring(0, tokens[index].length()-1));
+			list.add(tokens[index].substring(0, tokens[index].length()-1).trim());
 		}
 		index++;
 		return list;

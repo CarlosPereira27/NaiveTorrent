@@ -21,10 +21,28 @@ public class Tracker implements Serializable {
 				+ addressListening.getPort();
 	}
 	
-	public void setAddressListeningString(String addressListStr) {
+	public void setAddressListeningString(String addressListStr) 
+			throws Exception {
 		String[] tokens = addressListStr.split(":");
+		if (tokens.length != 2) {
+			throw new Exception(
+					"Erro! O endereço do tracker ('" 
+					+ addressListStr 
+					+ "') está mal definido.\n" 
+					+ "Formato correto: <ip>:<porta>"
+					);
+		}
 		String ip = tokens[0];
-		int port = Integer.parseInt(tokens[1]);
+		int port;
+		try {
+			port = Integer.parseInt(tokens[1]);
+		} catch (NumberFormatException e) {
+			throw new Exception(
+					"Erro! O número da porta do tracker ('"
+					+ addressListStr 
+					+ "') está mal definido (deve ser um número inteiro."
+					);
+		}
 		addressListening = new InetSocketAddress(ip, port);
 	}
 	

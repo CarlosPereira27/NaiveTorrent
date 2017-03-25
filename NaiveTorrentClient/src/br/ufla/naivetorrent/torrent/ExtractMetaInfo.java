@@ -154,10 +154,12 @@ public class ExtractMetaInfo {
 	 * @throws IOException
 	 */
 	public MetaTorrent generateMetaTorrent() 
-			throws IOException {
+			throws Exception {
 		if (!shareFile.exists()) {
-			throw new IOException("O diretório ou arquivo de compartilhamento (" +
-		shareFile.getPath() + ") não existe!");
+			throw new Exception(
+					"Erro! O diretório ou arquivo de compartilhamento ('"
+					+ shareFile.getPath() 
+					+ "') não existe!");
 		}
 		if (shareFile.isDirectory()) {
 			deslocToRootDirectory = shareFile.getPath().length() 

@@ -16,15 +16,11 @@ public class CreateShareTorrent {
 
 	private ShareTorrent share;
 	private byte lastPiece[];
-	private byte writyePeace[];
 	public static final String PART_EXTENSION = ".part";
 	private int sizeMetaInfo;
 
 	public CreateShareTorrent(ShareTorrent share) {
-		this.share = share;
-		if (this.share.getMyBitfield() == null) {
-			this.share.setMyBitfield(new BitSet());
-		}		
+		this.share = share;	
 	}
 
 	private boolean createSingleFile(File fileCreate) {
@@ -58,9 +54,9 @@ public class CreateShareTorrent {
 			String path = new String(directory + mt.getPathFile());
 			File fileFull = new File(path);
 
-			// if (fileFull.exists()) {
-			// fileFull.renameTo(new File(path + PART_EXTENSION));
-			// }
+			 if (fileFull.exists()) {
+				 fileFull.renameTo(new File(path + PART_EXTENSION));
+			 }
 
 			File fileCreate = new File(path + PART_EXTENSION);
 
@@ -74,10 +70,10 @@ public class CreateShareTorrent {
 			}
 			i++;
 		}
-		long peaceSize = (long) share.getMetaTorrent().getInfo().getPiecesLength();
+		long pieceSize = (long) share.getMetaTorrent().getInfo().getPiecesLength();
 		long torrentSize = share.getMetaTorrent().getInfo().getLenghtTorrent();
-		int size = (int) (torrentSize / peaceSize);
-		if (torrentSize % peaceSize != 0) {
+		int size = (int) (torrentSize / pieceSize);
+		if (torrentSize % pieceSize != 0) {
 			size++;
 		}
 		myBitSet = new BitSet(size);

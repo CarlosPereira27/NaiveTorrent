@@ -235,7 +235,8 @@ public class CommandLine implements Runnable {
 		commandTokens = cleanTokens.toArray(commandTokens);
 	}
 
-	private List<Tracker> decodeTrackersStr(List<String> trackersStr) {
+	private List<Tracker> decodeTrackersStr(List<String> trackersStr) 
+			throws Exception {
 		List<Tracker> trackers = new ArrayList<>();
 		for (String trackerStr : trackersStr) {
 			Tracker tracker = new Tracker();
@@ -243,6 +244,17 @@ public class CommandLine implements Runnable {
 			trackers.add(tracker);
 		}
 		return trackers;
+	}
+	
+	private void checkParameter(Object parameter, String nameParameter) 
+			throws Exception {
+		if (parameter == null) {
+			throw new Exception(
+					"Erro! O parâmetro <" 
+					+ nameParameter 
+					+ "> é obrigatório!"
+					);
+		}
 	}
 
 	/**
@@ -254,15 +266,29 @@ public class CommandLine implements Runnable {
 			@SuppressWarnings("unused")
 			String cmd = extractCommand.readCmd();
 			String sharePath = extractCommand.readParameter();
+			checkParameter(sharePath, "conteudo-compartilhado");
 			String torrentPath = extractCommand.readParameter();
+			checkParameter(torrentPath, "arquivo-torrent");
+			if (!torrentPath.endsWith(".torrent")) {
+				torrentPath += ".torrent";
+			}
 			List<String> trackersStr = extractCommand.readList();
+			checkParameter(trackersStr, "lista-rastreadores");
 			String createdBy = extractCommand.readParameter();
 			String comment = extractCommand.readParameter();
 			String encoding = extractCommand.readParameter();
-
 			File shareFile = new File(sharePath);
 			File torrentFile = new File(torrentPath);
-			torrentFile.createNewFile();
+			try {
+				torrentFile.createNewFile();
+			} catch (Exception e) {
+				throw new Exception(
+						"Erro! Não foi possível criar arquivo torrent ('"
+								+ torrentPath
+								+ "')."
+						);
+			}
+			
 			List<Tracker> trackers = decodeTrackersStr(trackersStr);
 
 			ExtractMetaInfo extractMetaInfo = new ExtractMetaInfo(shareFile);
@@ -276,14 +302,16 @@ public class CommandLine implements Runnable {
 			createTorrent.create();
 			System.out.println(
 					ConsoleForegroundColors.GREEN.getValue()
-					+ "Arquivo .torrent foi criado com sucesso!"
+					+ "Arquivo ('"
+					+ torrentPath + 
+					"') foi criado com sucesso!\n"
 					+ Console.DEFAULT.getValue());
 		} catch (Exception e) {
 			System.err.println(
 					ConsoleForegroundColors.RED.getValue()
 					+ e.getMessage() 
 					+ Console.DEFAULT.getValue());
-			// e.printStackTrace();
+			//e.printStackTrace();
 		}
 
 	}
