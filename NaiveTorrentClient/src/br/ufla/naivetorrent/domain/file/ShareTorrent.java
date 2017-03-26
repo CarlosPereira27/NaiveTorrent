@@ -5,9 +5,11 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import br.ufla.naivetorrent.connection.ManagerConnections;
 import br.ufla.naivetorrent.domain.peer.Peer;
@@ -35,14 +37,14 @@ public class ShareTorrent {
 	private DownloadStrategy downloadStrategy;
 	private List<Integer> nextDownloadPieces;
 	private List<Integer> onDonwloading;
-	private Map<MetaFileTorrent, Boolean> fileIsCompleted;
-	private Map<MetaFileTorrent, FileLimits> fileToLimits;
-	private Map<ByteBuffer, Peer> idToPeersUndefined;
-	private Map<ByteBuffer, Peer> idToPeers;
-	private Map<ByteBuffer, Peer> idToPeersConnected;
-	private Map<Peer, BitSet> peerToBitfield;
-	private Integer uploaded;
-	private Integer downloaded;
+	private ConcurrentMap<MetaFileTorrent, Boolean> fileIsCompleted;
+	private ConcurrentMap<MetaFileTorrent, FileLimits> fileToLimits;
+	private ConcurrentMap<ByteBuffer, Peer> idToPeersUndefined;
+	private ConcurrentMap<ByteBuffer, Peer> idToPeers;
+	private ConcurrentMap<ByteBuffer, Peer> idToPeersConnected;
+	private ConcurrentMap<Peer, BitSet> peerToBitfield;
+	private AtomicInteger uploaded;
+	private AtomicInteger downloaded;
 	private MetaTorrent metaTorrent;
 	private BitSet myBitfield;
 	private Date lastActivity;
@@ -58,7 +60,7 @@ public class ShareTorrent {
 	
 	
 	public ShareTorrent() {
-		fileToLimits = new LinkedHashMap<>();
+		fileToLimits = new ConcurrentHashMap<>();
 		List<MetaFileTorrent> metaFiles = new ArrayList<>();
 		long limit = 0;
 		for (MetaFileTorrent metaFile : metaFiles) {
@@ -145,7 +147,7 @@ public class ShareTorrent {
 	 * @return razão de upload por download do torrent
 	 */
 	public Double getRatio() {
-		return uploaded / (double) downloaded;
+		return uploaded.doubleValue() / downloaded.doubleValue();
 	}
 	
 	/**
@@ -237,11 +239,11 @@ public class ShareTorrent {
 	public Map<Peer, BitSet> getIdToBitfield() {
 		return peerToBitfield;
 	}
-	public Integer getUploaded() {
-		return uploaded;
+	public int getUploaded() {
+		return uploaded.get();
 	}
-	public Integer getDownloaded() {
-		return downloaded;
+	public int getDownloaded() {
+		return downloaded.get();
 	}
 	public MetaTorrent getMetaTorrent() {
 		return metaTorrent;
@@ -259,7 +261,7 @@ public class ShareTorrent {
 		return fileIsCompleted;
 	}
 
-	public void setFileIsCompleted(Map<MetaFileTorrent, Boolean> fileIsCompleted) {
+	public void setFileIsCompleted(ConcurrentMap<MetaFileTorrent, Boolean> fileIsCompleted) {
 		this.fileIsCompleted = fileIsCompleted;
 	}
 
@@ -267,7 +269,7 @@ public class ShareTorrent {
 		return fileToLimits;
 	}
 
-	public void setFileToLimits(Map<MetaFileTorrent, FileLimits> fileToLimits) {
+	public void setFileToLimits(ConcurrentMap<MetaFileTorrent, FileLimits> fileToLimits) {
 		this.fileToLimits = fileToLimits;
 	}
 
@@ -275,20 +277,20 @@ public class ShareTorrent {
 	public void setMe(Peer me) {
 		this.me = me;
 	}
-	public void setIdToPeers(Map<ByteBuffer, Peer> idToPeers) {
+	public void setIdToPeers(ConcurrentMap<ByteBuffer, Peer> idToPeers) {
 		this.idToPeers = idToPeers;
 	}
-	public void setIdToPeersConnected(Map<ByteBuffer, Peer> idToPeersConnected) {
+	public void setIdToPeersConnected(ConcurrentMap<ByteBuffer, Peer> idToPeersConnected) {
 		this.idToPeersConnected = idToPeersConnected;
 	}
-	public void setIdToBitfield(Map<Peer, BitSet> idToBitfield) {
+	public void setIdToBitfield(ConcurrentMap<Peer, BitSet> idToBitfield) {
 		this.peerToBitfield = idToBitfield;
 	}
-	public void setUploaded(Integer uploaded) {
-		this.uploaded = uploaded;
+	public void setUploaded(int uploaded) {
+		this.uploaded.set(uploaded);
 	}
-	public void setDownloaded(Integer downloaded) {
-		this.downloaded = downloaded;
+	public void setDownloaded(int downloaded) {
+		this.downloaded.set(downloaded);
 	}
 	public void setMetaTorrent(MetaTorrent metaTorrent) {
 		this.metaTorrent = metaTorrent;
@@ -321,7 +323,7 @@ public class ShareTorrent {
 		return idToPeersUndefined;
 	}
 
-	public void setIdToPeersUndefined(Map<ByteBuffer, Peer> idToPeersUndefined) {
+	public void setIdToPeersUndefined(ConcurrentMap<ByteBuffer, Peer> idToPeersUndefined) {
 		this.idToPeersUndefined = idToPeersUndefined;
 	}
 	

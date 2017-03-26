@@ -31,7 +31,7 @@ public class TestGenerateTorrent2 {
 	
 	@Test
 	public void testCreateFile() 
-			throws IOException {
+			throws Exception {
 		File shareFile = new File("/home/alcance/workspace/git/NaiveTorrent/"
 				+ "NaiveTorrentClient");
 		File torrentFile = new File("/home/alcance/naiveTorrent.torrent");
@@ -54,7 +54,7 @@ public class TestGenerateTorrent2 {
 	
 	@Test
 	public void readFileTest() 
-			throws IOException {
+			throws Exception {
 		File shareFile = new File("/home/alcance/workspace/git/NaiveTorrent/"
 				+ "NaiveTorrentClient");
 		File torrentFile = new File("/home/alcance/naiveTorrent.torrent");

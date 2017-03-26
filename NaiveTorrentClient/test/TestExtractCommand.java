@@ -1,5 +1,6 @@
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,6 +9,15 @@ import org.junit.Test;
 import br.ufla.naivetorrent.cli.ExtractCommand;
 
 public class TestExtractCommand {
+	
+	@Test
+	public void test2() {
+		String str = "file:///home/carlos/Documents";
+		File file = new File(str);
+		System.out.println(file.getPath());
+		System.out.println(file.exists());
+		
+	}
 	
 	@Test
 	public void test() {
