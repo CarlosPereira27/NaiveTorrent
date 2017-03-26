@@ -18,16 +18,17 @@ public class TorrentTrackerContract {
 				ON DELETE CASCADE );"
     */
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
+    public static final String CREATE_TABLE = 
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
             + Columns.ID_TORRENT + " INTEGER NOT NULL, "
             + Columns.ID_TRACKER + " INTEGER NOT NULL, "
             + "PRIMARY KEY (" + Columns.ID_TORRENT + ", " + Columns.ID_TRACKER + "), "
             + "FOREIGN KEY(" + Columns.ID_TORRENT + ") REFERENCES " 
-            + MetaFileTorrentContract.TABLE_NAME + "(" + MetaFileTorrentContract.Columns.ID + ") "
-            + " ON DELETE CASCADE, "
+            	+ MetaFileTorrentContract.TABLE_NAME + "(" + MetaFileTorrentContract.Columns.ID + ") "
+            		+ " ON DELETE CASCADE, "
             + "FOREIGN KEY(" + Columns.ID_TRACKER + ") REFERENCES " 
-            + TrackerContract.TABLE_NAME + "(" + TrackerContract.Columns.ID + ") "
-            + " ON DELETE CASCADE );";
+            	+ TrackerContract.TABLE_NAME + "(" + TrackerContract.Columns.ID + ") "
+            		+ " ON DELETE CASCADE );";
 
     public static abstract class Columns {
         public static final String ID_TORRENT = "idTorrent";

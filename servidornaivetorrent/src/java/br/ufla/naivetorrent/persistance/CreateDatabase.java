@@ -1,7 +1,6 @@
 package br.ufla.naivetorrent.persistance;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
@@ -38,14 +37,15 @@ public class CreateDatabase {
 	 * Cria o banco, caso já exista não faz nada.
 	 * @throws SQLException 
 	 */
-	public void create() throws SQLException {
+	public void create() 
+			throws SQLException {
 		List<String> sqlCreateTables = getSqlCreateTables();
 		Connection connection = null;
+		Statement statement = null;
 		try {
-			connection = DriverManager.getConnection(DatabaseContract.PREFIX_SQLITE + 
-					DatabaseContract.DATABASE_NAME);
+			connection = DatabaseContract.getConnection();
 			connection.setAutoCommit(false);
-			Statement statement = connection.createStatement();
+			statement = connection.createStatement();
 			for (String sql : sqlCreateTables) {
 				statement.execute(sql);
 			}
@@ -56,8 +56,12 @@ public class CreateDatabase {
 		} finally {
 			connection.setAutoCommit(true);
 			try {
-				if (connection != null)
+				if (statement != null) {
+					statement.close();
+				}
+				if (connection != null) {
 					connection.close();
+				}
 			} catch (SQLException e) {
 				System.err.println(e);
 			}

@@ -10,27 +10,34 @@ public class Tracker implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	private ByteBuffer id;
-	private InetSocketAddress socketAddressListening;
+	private InetSocketAddress addressListening;
 	
 	/**
 	 * Recupera o endereço do tracker.
 	 * @return endereço do tracker
 	 */
 	public String getAddress() {
-		return socketAddressListening.getHostName() + ":"
-				+ socketAddressListening.getPort();
+		return addressListening.getHostName() + ":"
+				+ addressListening.getPort();
+	}
+	
+	public void setAddressListeningString(String addressListStr) {
+		String[] tokens = addressListStr.split(":");
+		String ip = tokens[0];
+		int port = Integer.parseInt(tokens[1]);
+		addressListening = new InetSocketAddress(ip, port);
 	}
 	
 	public String getIpOrHostName() {
-		if (socketAddressListening == null)
+		if (addressListening == null)
 			return null;
-		return socketAddressListening.getAddress().getHostAddress();
+		return addressListening.getAddress().getHostAddress();
 	}
 	
 	public Integer getPort() {
-		if (socketAddressListening == null)
+		if (addressListening == null)
 			return null;
-		return socketAddressListening.getPort();
+		return addressListening.getPort();
 	}
 	
 	public ByteBuffer getId() {
@@ -45,11 +52,11 @@ public class Tracker implements Serializable {
 	public void setIdHex(String idHex) {
 		this.id = UtilHex.toBytes(idHex);
 	}
-	public InetSocketAddress getSocketAddressListening() {
-		return socketAddressListening;
+	public InetSocketAddress getAddressListening() {
+		return addressListening;
 	}
-	public void setSocketAddressListening(InetSocketAddress socketAddressListening) {
-		this.socketAddressListening = socketAddressListening;
+	public void setAddressListening(InetSocketAddress addressListening) {
+		this.addressListening = addressListening;
 	}
 	
 	
@@ -59,7 +66,7 @@ public class Tracker implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
-		result = prime * result + ((socketAddressListening == null) ? 0 : socketAddressListening.hashCode());
+		result = prime * result + ((addressListening == null) ? 0 : addressListening.hashCode());
 		return result;
 	}
 	@Override
@@ -76,10 +83,10 @@ public class Tracker implements Serializable {
 				return false;
 		} else if (!id.equals(other.id))
 			return false;
-		if (socketAddressListening == null) {
-			if (other.socketAddressListening != null)
+		if (addressListening == null) {
+			if (other.addressListening != null)
 				return false;
-		} else if (!socketAddressListening.equals(other.socketAddressListening))
+		} else if (!addressListening.equals(other.addressListening))
 			return false;
 		return true;
 	}
@@ -88,7 +95,7 @@ public class Tracker implements Serializable {
 	// TOSTRING
 	@Override
 	public String toString() {
-		return "Tracker [id=" + id + ", socketAddressListening=" + socketAddressListening + "]";
+		return "Tracker [id=" + id + ", socketAddressListening=" + addressListening + "]";
 	}
 	
 

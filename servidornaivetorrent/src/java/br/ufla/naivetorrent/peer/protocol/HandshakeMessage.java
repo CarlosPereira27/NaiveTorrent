@@ -1,7 +1,6 @@
 package br.ufla.naivetorrent.peer.protocol;
 
 import java.io.Serializable;
-import java.net.ProtocolException;
 import java.nio.ByteBuffer;
 
 import br.ufla.naivetorrent.util.UtilByteString;

@@ -4,8 +4,8 @@ import java.util.List;
 
 public class ExtractCommand {
 	
-	private int index;
-	private String[] tokens;
+	protected int index;
+	protected String[] tokens;
 	
 	public ExtractCommand (String commando) {
 		tokens = commando.split(" ");

@@ -21,6 +21,18 @@ public class MetaInfoTorrent implements Serializable  {
 	}
 	
 	/**
+	 * Recupera tamanho do torrent.
+	 * @return tamanho do torrent
+	 */
+	public long getLenghtTorrent() {
+		long length = 0;
+		for (MetaFileTorrent metaFile : metaFiles) {
+			length += metaFile.getLength();
+		}
+		return length;
+	}
+	
+	/**
 	 * Adiciona uma hash de um pedaço na lista de hash de pedaços.
 	 * @param pieceHash hash de um pedaço
 	 */

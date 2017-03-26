@@ -15,7 +15,8 @@ public class TrackerContract {
             port INTEGER NOT NULL );"
     */
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
+    public static final String CREATE_TABLE = 
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
             + Columns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
             + Columns.HASH_ID + " TEXT UNIQUE NOT NULL, "
             + Columns.HOST_NAME + " TEXT NOT NULL, "

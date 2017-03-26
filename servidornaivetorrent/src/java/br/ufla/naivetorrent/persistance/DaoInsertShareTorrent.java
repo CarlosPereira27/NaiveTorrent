@@ -1,7 +1,6 @@
 package br.ufla.naivetorrent.persistance;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -30,11 +29,11 @@ public class DaoInsertShareTorrent {
 	 * @param shareTorrent
 	 * @throws SQLException
 	 */
-	public void insertShareTorrent(ShareTorrent shareTorrent) throws SQLException {
+	public void insertShareTorrent(ShareTorrent shareTorrent) 
+			throws SQLException {
 		Connection connection = null;
 		try {
-			connection = DriverManager.getConnection(DatabaseContract.PREFIX_SQLITE 
-					+ DatabaseContract.DATABASE_NAME);
+			connection = DatabaseContract.getConnection();
 			connection.setAutoCommit(false);
 			MetaTorrent metaTorrent = shareTorrent.getMetaTorrent();
 			MetaInfoTorrent metaInfo = metaTorrent.getInfo();
@@ -54,8 +53,9 @@ public class DaoInsertShareTorrent {
 		} finally {
 			connection.setAutoCommit(true);
 			try {
-				if (connection != null)
+				if (connection != null) {
 					connection.close();
+				}
 			} catch (SQLException e) {
 				System.err.println(e);
 			}
@@ -78,7 +78,8 @@ public class DaoInsertShareTorrent {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO " + MetaTorrentContract.TABLE_NAME + " ("
+			ps = con.prepareStatement(
+					"INSERT INTO " + MetaTorrentContract.TABLE_NAME + " ("
 					+ MetaTorrentContract.Columns.BITFIELD + ", "
 					+ MetaTorrentContract.Columns.COMMENT + ", "
 					+ MetaTorrentContract.Columns.CREATED_BY + ", " 
@@ -107,10 +108,12 @@ public class DaoInsertShareTorrent {
 			if (rs.next())
 				idMetaTorrent = rs.getInt(1);
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 		return idMetaTorrent;
 	}
@@ -134,9 +137,9 @@ public class DaoInsertShareTorrent {
 		try {
 			ps = con.prepareStatement(
 					"INSERT INTO " + MetaInfoTorrentContract.TABLE_NAME + " ("
-							+ MetaInfoTorrentContract.Columns.PIECES_HASH + ", "
-							+ MetaInfoTorrentContract.Columns.PIECES_LENGTH + ")\n" 
-							+ "VALUES (?, ?);",
+					+ MetaInfoTorrentContract.Columns.PIECES_HASH + ", "
+					+ MetaInfoTorrentContract.Columns.PIECES_LENGTH + ")\n" 
+					+ "VALUES (?, ?);",
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, metaInfoTorrent.getPiecesHashString());
 			ps.setInt(2, metaInfoTorrent.getPiecesLength());
@@ -144,10 +147,12 @@ public class DaoInsertShareTorrent {
 			if (rs.next())
 				idInfoTorrent = rs.getInt(1);
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 		return idInfoTorrent;
 	}
@@ -204,10 +209,12 @@ public class DaoInsertShareTorrent {
 			if (rs.next())
 				idMetaFile = rs.getInt(1);
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 		return idMetaFile;
 	}
@@ -252,7 +259,8 @@ public class DaoInsertShareTorrent {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO " + TrackerContract.TABLE_NAME + " ("
+			ps = con.prepareStatement(
+					"INSERT INTO " + TrackerContract.TABLE_NAME + " ("
 					+ TrackerContract.Columns.HASH_ID + ", " 
 					+ TrackerContract.Columns.HOST_NAME + ", "
 					+ TrackerContract.Columns.PORT + ")\n" + 
@@ -266,10 +274,12 @@ public class DaoInsertShareTorrent {
 			if (rs.next())
 				idTracker = rs.getInt(1);
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 		return idTracker;
 	}
@@ -284,12 +294,14 @@ public class DaoInsertShareTorrent {
 	 * @return id do tracker
 	 * @throws SQLException
 	 */
-	private Integer getTrackerId(Connection con, Tracker tracker) throws SQLException {
+	private Integer getTrackerId(Connection con, Tracker tracker) 
+			throws SQLException {
 		Integer idTracker = null;
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con.prepareStatement("SELECT " + TrackerContract.Columns.ID 
+			ps = con.prepareStatement(
+					"SELECT " + TrackerContract.Columns.ID 
 					+ " FROM " + TrackerContract.TABLE_NAME + "\n" 
 					+ "WHERE " + TrackerContract.Columns.HASH_ID + " = ?");
 			ps.setString(1, tracker.getIdHex());
@@ -297,10 +309,12 @@ public class DaoInsertShareTorrent {
 			if (rs.next())
 				idTracker = rs.getInt(1);
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 		return idTracker;
 	}
@@ -322,7 +336,8 @@ public class DaoInsertShareTorrent {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
-			ps = con.prepareStatement("INSERT INTO " + TorrentTrackerContract.TABLE_NAME + " ("
+			ps = con.prepareStatement(
+					"INSERT INTO " + TorrentTrackerContract.TABLE_NAME + " ("
 					+ TorrentTrackerContract.Columns.ID_TORRENT + ", " 
 					+ TorrentTrackerContract.Columns.ID_TRACKER + ")\n" 
 					+ "VALUES (?, ?);");
@@ -330,10 +345,12 @@ public class DaoInsertShareTorrent {
 			ps.setInt(2, idTracker);
 			ps.execute();
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 	}
 
@@ -382,10 +399,12 @@ public class DaoInsertShareTorrent {
 			ps.setInt(2, idInfo);
 			ps.execute();
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 	}
 
@@ -415,10 +434,12 @@ public class DaoInsertShareTorrent {
 			ps.setInt(2, idFile);
 			ps.execute();
 		} finally {
-			if (ps != null)
+			if (ps != null) {
 				ps.close();
-			if (rs != null)
+			}
+			if (rs != null) {
 				rs.close();
+			}
 		}
 	}
 

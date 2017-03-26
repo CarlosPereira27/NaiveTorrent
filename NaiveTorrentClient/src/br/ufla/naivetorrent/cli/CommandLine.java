@@ -9,8 +9,11 @@ package br.ufla.naivetorrent.cli;
 import java.io.File;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.List;
 import java.util.Scanner;
+
+import org.junit.Test;
 
 import br.ufla.naivetorrent.cli.console.Console;
 import br.ufla.naivetorrent.cli.console.ConsoleForegroundColors;
@@ -34,6 +37,7 @@ public class CommandLine implements Runnable {
 	public static final String PAUSE = "pause";
 	public static final String REMOVE = "remove-torrent";
 	public static final String LIST_TORRENT = "list-torrent";
+	public static final String TORRENT_INFO = "show-torrent-info";
 	public static final String HELP = "help";
 	public static final String QUIT = "quit";
 	public static final String CMD = "cmd";
@@ -43,7 +47,9 @@ public class CommandLine implements Runnable {
 			+ "<(op)criador> <(op)comentário> <(op)codificação>\n"
 			+ "# add-torrent <local-conteudo-compartilhado> <arquivo-torrent>\n" 
 			+ "# play <id-torrent>\n"
-			+ "# pause <id-torrent>\n" + "# remove-torrent <id-torrent>\n" 
+			+ "# pause <id-torrent>\n"
+			+ "# remove-torrent <id-torrent>\n" 
+			+ "# show-torrent-info <id-torrent>\n" 
 			+ "# list-torrent\n" 
 			+ "# help\n"
 			+ "# quit\n";
@@ -66,6 +72,8 @@ public class CommandLine implements Runnable {
 	private Scanner scanner;
 	private String[] commandTokens;
 	private List<ShareTorrent> shareTorrents;
+	
+	
 
 	public CommandLine() {
 		scanner = new Scanner(System.in);
@@ -89,8 +97,45 @@ public class CommandLine implements Runnable {
 		commands.add(HELP);
 		commands.add(QUIT);
 		commands.add(CMD);
+		commands.add(TORRENT_INFO);
 		return commands;
 	}
+	/**
+	 * 
+	 * @param sharetorrent arquivo torrent que o usuário está fazendo o dowload
+	 */
+	@Test
+	public void showBitfield(ShareTorrent sharetorrent){
+		
+		BitSet bitfield = sharetorrent.getMyBitfield();
+
+		String caractere = "\u2587";
+
+		System.out.println("\n");
+
+		for (int i = 0; i < bitfield.length(); i++) {
+
+			/**
+			 * se o bitfield for 1 quer dizer que o usuario ja tem aquele pedaco
+			 */
+			if (bitfield.get(i)) {
+				System.out
+						.print(ConsoleForegroundColors.GREEN.getValue() + " " + caractere + Console.DEFAULT.getValue());
+
+			} else {
+				System.out.print(ConsoleForegroundColors.RED.getValue() + " " + caractere + Console.DEFAULT.getValue());
+			}
+		}
+
+		System.out.println("\n\t legenda:");
+		System.out.println("+-------------------------+");
+		System.out.println("| " + ConsoleForegroundColors.GREEN.getValue() + " " + caractere
+				+ Console.DEFAULT.getValue() + " pedaços completos" + "    |\n" + "| "
+				+ ConsoleForegroundColors.RED.getValue() + " " + caractere + Console.DEFAULT.getValue()
+				+ " pedaços incompletos" + "  |\n" + "+-------------------------+\n");
+	}
+	
+	
 
 	@Override
 	public void run() {
@@ -145,6 +190,9 @@ public class CommandLine implements Runnable {
 					case LIST_TORRENT:
 						listTorrentCmd();
 						break;
+					case TORRENT_INFO:
+						infoTorrentCmd();
+						break;
 					case HELP:
 						System.out.println(MENSAGEM_HELP);
 						break;
@@ -189,7 +237,9 @@ public class CommandLine implements Runnable {
 			return false;
 		}
 		String strCmd = commandTokens[0];
+		
 		int commandLength = commandTokens.length;
+		
 		if (strCmd.equals(CREATE_TORRENT) && commandLength >= 3) {
 			return true;
 		}
@@ -215,6 +265,9 @@ public class CommandLine implements Runnable {
 			return true;
 		}
 		if (strCmd.equals(CLEAR) && commandLength == 1) {
+			return true;
+		}
+		if (strCmd.equals(TORRENT_INFO) && commandLength == 2) {
 			return true;
 		}
 		return false;
@@ -283,7 +336,7 @@ public class CommandLine implements Runnable {
 					ConsoleForegroundColors.RED.getValue()
 					+ e.getMessage() 
 					+ Console.DEFAULT.getValue());
-			// e.printStackTrace();
+			 e.printStackTrace();
 		}
 
 	}
@@ -309,9 +362,64 @@ public class CommandLine implements Runnable {
 	}
 
 	private void listTorrentCmd() {
-		// TODO Auto-generated method stub
+		
+	ExtractCommandsIds  extcommands = new ExtractCommandsIds(commandTokens);
+			
+			try {
+				
+				List<ShareTorrent> sharetorrents  = new ArrayList<>();
+				
+				sharetorrents = new DaoRecoveryShareTorrents().getShareTorrents();
+				
+				
+				for(int i=0;i<sharetorrents.size();i++){
+					System.out.println("id: "+i+" "+sharetorrents.get(i).getSharePath().getName());
+				}
+								
+				
+				
+			} catch (Exception e) {
+				
+				System.out.println(e.getMessage());
+			}
+	
+		}
+	/**
+	 *  exibi a quantidade de pedaços de um determinado torrent
+	 */
+	private void infoTorrentCmd() {
+		
+		ExtractCommandsIds  extcommands = new ExtractCommandsIds(commandTokens);
+		
+		try {
+			
+			extcommands.readCmd();
+			
+			int id = extcommands.readParameterint();
+			
+			//List<ShareTorrent> sharetorrents  = new ArrayList<>();
+			
+			//sharetorrents = new DaoRecoveryShareTorrents().getShareTorrents();
+			
+			//teste
+			ShareTorrent sharetorrent = new ShareTorrent();
+			sharetorrent.setMyBitfield(new BitSet(10));
+			sharetorrent.getMyBitfield().set(3);
+			sharetorrent.getMyBitfield().set(10);
+			showBitfield(sharetorrent);
+			//		
+
+			
+			//showBitfield(sharetorrents.get(id));
+			
+		} catch (Exception e) {
+			
+			System.out.println(e.getMessage());
+		}
+
 
 	}
+	
 
 	/**
 	 * Teste

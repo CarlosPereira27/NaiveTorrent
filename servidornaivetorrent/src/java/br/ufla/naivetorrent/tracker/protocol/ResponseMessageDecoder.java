@@ -64,7 +64,7 @@ public class ResponseMessageDecoder {
 			peer.setIdHex((String) peerDic.get(
 					ResponseAttributes.PEER_ID));
 			String peerIp = (String) peerDic.get(ResponseAttributes.PEER_IP);
-			Integer peerPort = (Integer) peerDic.get(ResponseAttributes.PEER_PORT);
+			Integer peerPort = ((Long) peerDic.get(ResponseAttributes.PEER_PORT)).intValue();
 			peer.setSocketAddressListening(new InetSocketAddress(peerIp, peerPort));
 			peers.add(peer);
 		}
@@ -77,16 +77,16 @@ public class ResponseMessageDecoder {
 	 */
 	private void decodeResponseMessage(Map<String, Object> dic) {
 		responseMessage = new ResponseMessage();
-		responseMessage.setInterval((Integer) 
-				dic.get(ResponseAttributes.INTERVAL));
-		responseMessage.setMinInterval((Integer) 
-				dic.get(ResponseAttributes.MIN_INTERVAL));
+		responseMessage.setInterval(((Long) 
+				dic.get(ResponseAttributes.INTERVAL)).intValue());
+		responseMessage.setMinInterval(((Long) 
+				dic.get(ResponseAttributes.MIN_INTERVAL)).intValue());
 		responseMessage.setTrackerId((String) 
 				dic.get(ResponseAttributes.TRACKER_ID));
-		responseMessage.setComplete((Integer) 
-				dic.get(ResponseAttributes.COMPLETE));
-		responseMessage.setIncomplete((Integer) 
-				dic.get(ResponseAttributes.INCOMPLETE));
+		responseMessage.setComplete(((Long) 
+				dic.get(ResponseAttributes.COMPLETE)).intValue());
+		responseMessage.setIncomplete(((Long) 
+				dic.get(ResponseAttributes.INCOMPLETE)).intValue());
 		responseMessage.setPeers(getListPeers(dic));
 		if (dic.containsKey(ResponseAttributes.CLIENT_ID))
 			responseMessage.setClientId((String) 

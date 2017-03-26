@@ -15,7 +15,8 @@ public class MetaFileTorrentContract {
             pathFile TEXT NOT NULL);"
     */
 
-    public static final String CREATE_TABLE = "CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
+    public static final String CREATE_TABLE = 
+    		"CREATE TABLE IF NOT EXISTS " + TABLE_NAME + " ( "
             + Columns.ID + " INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, "
             + Columns.LENGTH + " INTEGER NOT NULL, "
             + Columns.MD5SUM + " TEXT NOT NULL, "

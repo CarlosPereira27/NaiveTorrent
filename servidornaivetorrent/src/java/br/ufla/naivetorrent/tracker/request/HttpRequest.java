@@ -15,6 +15,7 @@ import br.ufla.naivetorrent.tracker.protocol.ResponseMessageError;
 
 public class HttpRequest implements Runnable {
 	
+	private static final String PROTOCOL = "http://";
 	private static final String SERVLET = "/tracker";
 	private static final String PROJECT = "/servidornaivetorrent";
 	@SuppressWarnings("unused")
@@ -30,9 +31,10 @@ public class HttpRequest implements Runnable {
 		numParameters = 0;
 		sbURL = new StringBuilder();
 		sbResponse = new StringBuilder();
-		sbURL.append(tracker.getSocketAddressListening().getHostName())
+		sbURL.append(PROTOCOL)
+			.append(tracker.getAddressListening().getHostName())
 			.append(':')
-			.append(tracker.getSocketAddressListening().getPort())
+			.append(tracker.getAddressListening().getPort())
 			.append(PROJECT)
 			.append(SERVLET);
 		setParameters();
@@ -102,6 +104,7 @@ public class HttpRequest implements Runnable {
 				sbResponse.append(inputLine);
 			}
 			in.close();
+			System.out.println(sbResponse.toString());
 			ResponseMessageDecoder responseMessageDecoder = 
 					new ResponseMessageDecoder(sbResponse.toString());
 			if (responseMessageDecoder.isMessageError()) {
@@ -109,9 +112,9 @@ public class HttpRequest implements Runnable {
 				ResponseMessageError responseMessageError = 
 					responseMessageDecoder.getResponseMessageError();
 			} else {
-				@SuppressWarnings("unused")
 				ResponseMessage responseMessage = 
 					responseMessageDecoder.getResponseMessage();
+				System.out.println(responseMessage);
 			}
 		} else {
 			

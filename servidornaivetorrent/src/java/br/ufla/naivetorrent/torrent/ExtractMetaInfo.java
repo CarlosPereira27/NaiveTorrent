@@ -102,7 +102,7 @@ public class ExtractMetaInfo {
 				metaTorrent.getInfo().addPieceHash(ByteBuffer
 						.wrap(messageDigestSHA1.digest(lastPiece)));
 				
-			}
+			}//FALTA EXTRAIR ÚLTIMO PEDACO
 			metaFileTorrent.setMd5sum(ByteBuffer.wrap(messageDigestMD5.digest()));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
@@ -155,6 +155,10 @@ public class ExtractMetaInfo {
 	 */
 	public MetaTorrent generateMetaTorrent() 
 			throws IOException {
+		if (!shareFile.exists()) {
+			throw new IOException("O diretório ou arquivo de compartilhamento (" +
+		shareFile.getPath() + ") não existe!");
+		}
 		if (shareFile.isDirectory()) {
 			deslocToRootDirectory = shareFile.getPath().length() 
 					- shareFile.getName().length() - 1;
