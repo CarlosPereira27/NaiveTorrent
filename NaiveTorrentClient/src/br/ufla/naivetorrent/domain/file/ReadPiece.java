@@ -20,7 +20,11 @@ public class ReadPiece {
 	private int readFile(MetaFileTorrent metaFile, 
 			long desloc, int length, byte data[], int index) 
 					throws IOException {
-		String pathFile = shareTorrent.getSharePathString() + metaFile.getPathFile();
+		String pathFile = shareTorrent.getSharePathString();
+		if (shareTorrent.getSharePath().isDirectory()) {
+			pathFile += "/";
+		}
+		pathFile += metaFile.getPathFile();
 		if (!shareTorrent.isCompleted(metaFile)) {
 			pathFile += TORRENT_PART_FILE;
 		}

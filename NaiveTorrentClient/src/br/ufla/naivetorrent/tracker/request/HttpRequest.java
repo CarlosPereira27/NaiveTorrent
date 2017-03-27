@@ -40,7 +40,6 @@ public class HttpRequest implements Runnable {
 			.append(PROJECT)
 			.append(SERVLET);
 		setParameters();
-		System.out.println(sbURL.toString());
 	}
 	
 	/**
@@ -106,7 +105,6 @@ public class HttpRequest implements Runnable {
 				sbResponse.append(inputLine);
 			}
 			in.close();
-			System.out.println(sbResponse.toString());
 			ResponseMessageDecoder responseMessageDecoder = 
 					new ResponseMessageDecoder(sbResponse.toString());
 			if (responseMessageDecoder.isMessageError()) {

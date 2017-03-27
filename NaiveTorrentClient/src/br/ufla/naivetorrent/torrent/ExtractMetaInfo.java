@@ -15,9 +15,10 @@ import br.ufla.naivetorrent.domain.tracker.Tracker;
 public class ExtractMetaInfo {
 	
 	/**
-	 * Pedaços de 1 MB.
+	 * Pedaços de 1 MB  -> 1048576K
+	 * Pedaços de 512KB ->  524288K
 	 */
-	public static final int PIECE_LENGTH = 1048576;
+	public static final int PIECE_LENGTH = 524288;
 	private File shareFile;
 	private MetaTorrent metaTorrent;
 	private int deslocToRootDirectory;
@@ -102,7 +103,7 @@ public class ExtractMetaInfo {
 				metaTorrent.getInfo().addPieceHash(ByteBuffer
 						.wrap(messageDigestSHA1.digest(lastPiece)));
 				
-			}//FALTA EXTRAIR ÚLTIMO PEDACO
+			}
 			metaFileTorrent.setMd5sum(ByteBuffer.wrap(messageDigestMD5.digest()));
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();

@@ -25,8 +25,11 @@ public class HashPiece {
 			long desloc, int length, 
 			MessageDigest messageDigest) 
 					throws IOException {
-		String pathFile  = shareTorrent.getSharePathString() 
-				+ metaFile.getPathFile();
+		String pathFile = shareTorrent.getSharePathString();
+		if (shareTorrent.getSharePath().isDirectory()) {
+			pathFile += "/";
+		}
+		pathFile += metaFile.getPathFile();
 		if (!shareTorrent.isCompleted(metaFile)) {
 			pathFile += ReadPiece.TORRENT_PART_FILE;
 		}

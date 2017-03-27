@@ -1,13 +1,14 @@
 package br.ufla.naivetorrent.tracker.request;
 
 import java.nio.ByteBuffer;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.peer.Peer;
@@ -23,15 +24,17 @@ public class ManagerTorrentRequest implements Runnable {
 	private RequestMessage requestMessage;
 	private ManagerRequest managerRequest;
 	private SortedSet<Tracker> trackers;
-	private Boolean stop;
-	private Boolean stopTorrent;
+	private AtomicBoolean stop;
+	private AtomicBoolean stopTorrent;
+	private Set<Tracker> trackersUpdate;
 
 
 	public ManagerTorrentRequest(ShareTorrent shareTorrent, ManagerRequest managerRequest) {
 		this.shareTorrent = shareTorrent;
 		this.managerRequest = managerRequest;
-		stop = false;
-		stopTorrent = false;
+		stop = new AtomicBoolean(false);
+		stopTorrent = new AtomicBoolean(false);
+		trackersUpdate = new HashSet<>();
 		defineTrackers();
 		createRequestMessage();
 		updateRequestMessage();
@@ -82,7 +85,9 @@ public class ManagerTorrentRequest implements Runnable {
 		if (shareTorrent.isSeeder()) {
 			requestMessage.setEvent(RequestEvent.COMPLETED);
 		}
-		requestMessage.setTrackerId(tracker.getIdHex());
+		if (tracker.getId() != null) {
+			requestMessage.setTrackerId(tracker.getIdHex());
+		}
 		requestMessage.setPeerId(UtilHex.toHexString(managerRequest.getClientId(tracker)));
 		HttpRequest httpRequest = new HttpRequest(tracker, requestMessage, this);
 		new Thread(httpRequest).start();
@@ -91,9 +96,9 @@ public class ManagerTorrentRequest implements Runnable {
 	private void stopRequest() {
 		updateRequestMessage();
 		for (Tracker tracker : trackers) {
-			if (stop) {
+			if (stop.get()) {
 				requestMessage.setEvent(RequestEvent.STOPPED);
-			} else if (stopTorrent) {
+			} else if (stopTorrent.get()) {
 				requestMessage.setEvent(RequestEvent.STOPPED_FILE);
 			}
 			requestMessage.setTrackerId(tracker.getIdHex());
@@ -107,7 +112,16 @@ public class ManagerTorrentRequest implements Runnable {
 	public void run() {
 		initialComunication();
 		Iterator<Tracker> itTracker;
-		while (!stop && !stopTorrent) {
+		while (!stop.get() && !stopTorrent.get()) {
+			synchronized (trackersUpdate) {
+				synchronized (trackers) {
+					for (Tracker tracker : trackersUpdate) {
+						trackers.remove(tracker);
+						trackers.add(tracker);
+					}
+				}
+				trackersUpdate.clear();
+			}
 			itTracker = trackers.iterator();
 			try {
 				Thread.sleep(Tracker.MIN_INTERVAL);
@@ -132,28 +146,35 @@ public class ManagerTorrentRequest implements Runnable {
 	public void updateResponse(ResponseMessage responseMessage, Tracker tracker) {
 		ConcurrentHashMap<Tracker, ByteBuffer> trackerToClientId = 
 				managerRequest.getTrackerToClientId();
-		ByteBuffer id = UtilHex.toBytes(responseMessage.getClientId());
-		ByteBuffer actualId = trackerToClientId.get(tracker);
-		if (!id.equals(actualId)) {
-			trackerToClientId.put(tracker, id);
+		if (responseMessage.getClientId() != null) {
+			ByteBuffer id = UtilHex.toBytes(responseMessage.getClientId());
+			ByteBuffer actualId = trackerToClientId.get(tracker);
+			if (!id.equals(actualId)) {
+				trackerToClientId.put(tracker, id);
+			}
 		}
 		String trackerIdHex = responseMessage.getTrackerId();
 		if (trackerIdHex != null) {
 			tracker.setIdHex(trackerIdHex);
 		}
-		int interval = responseMessage.getInterval();
-		if (interval != tracker.getInterval()) {
+		Integer interval = responseMessage.getInterval();
+		if (interval != null && interval != tracker.getInterval()) {
 			tracker.setInterval(interval);
-			synchronized (trackers) {
-				trackers.remove(tracker);
-				trackers.add(tracker);
+			synchronized (trackersUpdate) {
+				trackersUpdate.add(tracker);
 			}
 		}
 		List<Peer> peers = responseMessage.getPeers();
+		if (peers == null) {
+			return;
+		}
 		Set<Peer> peersDisconnected = shareTorrent.getPeers();
 		Set<Peer> peersConnected = shareTorrent.getPeersConnected();
 		for (Peer peer : peers) {
-			if (!peersConnected.contains(peer) && !peersDisconnected.contains(peer)) {
+			if (!peersConnected.contains(peer) 
+					&& !peersDisconnected.contains(peer) 
+					&& !peer.getSocketAddressListening()
+						.equals(shareTorrent.getMe().getSocketAddressListening())) {
 				peersDisconnected.add(peer);
 			}
 		}

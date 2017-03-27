@@ -10,7 +10,7 @@ import br.ufla.naivetorrent.util.UtilHex;
 public class Tracker implements Serializable, Comparable<Tracker> {
 	
 	private static final long serialVersionUID = 1L;
-	public static final int MIN_INTERVAL = 60;
+	public static final int MIN_INTERVAL = 60000;
 	private ByteBuffer id;
 	private InetSocketAddress addressListening;
 	private AtomicInteger interval;
@@ -88,7 +88,7 @@ public class Tracker implements Serializable, Comparable<Tracker> {
 	}
 
 	public void setInterval(int interval) {
-		this.interval.set(interval);
+		this.interval.set(interval * 1000);
 	}
 	
 	

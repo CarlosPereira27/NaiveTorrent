@@ -13,9 +13,12 @@ public class TestExtractCommand {
 	
 	@Test
 	public void test2() {
-		String str = "file:///home/carlos/Documents";
+		String str = "/home/carlos/Documents/teste/";
+		String str2 = "ubuntu-14.04.3-desktop-amd64.iso";
 		File file = new File(str);
 		System.out.println(file.getPath());
+		File file2 = new File(file.getPath() + "/" + str2);
+		System.out.println(file2.getPath());
 		System.out.println(file.exists());
 		
 	}

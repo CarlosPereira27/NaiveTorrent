@@ -9,10 +9,10 @@ package br.ufla.naivetorrent.peer.protocol;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.PriorityQueue;
-import java.util.Set;
 
 /**
  * 
@@ -61,7 +61,7 @@ public class DownloadStrategy {
         PriorityQueue<PieceFrequency> pieceQueue = new PriorityQueue<>();
         BitSet myBitField = sharetorrent.getMyBitfieldWithNext();
         int size = myBitField.size();
-        Set<BitSet> bitfields = (Set<BitSet>) sharetorrent.getIdToBitfield().values();
+        Collection<BitSet> bitfields = sharetorrent.getIdToBitfield().values();
         
         for (int i= 0; i < size; i++) {
             if (!myBitField.get(i)){

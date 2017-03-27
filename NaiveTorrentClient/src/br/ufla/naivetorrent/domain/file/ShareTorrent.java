@@ -41,6 +41,11 @@ public class ShareTorrent {
 					new Thread(new HandshakeHandler(me, nextPeer(), 
 							ShareTorrent.this, peerSocketListener)).start();
 				}
+				try {
+					Thread.sleep(400);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 			
 		}
@@ -58,13 +63,15 @@ public class ShareTorrent {
 				if (!nextDownloadPieces.isEmpty() && 
 						onDonwloading.size() < MAX_DOWNLOADING) {
 					int pieceIndex = getNextPiece();
-					myBitfieldNextDownloading.set(pieceIndex);
-					onDonwloading.add(pieceIndex);
 					Peer peer = getPeerHave(pieceIndex);
-					managerConnections.downloadingPiece(pieceIndex, peer);
+					if (peer != null) {
+						myBitfieldNextDownloading.set(pieceIndex);
+						onDonwloading.add(pieceIndex);
+						managerConnections.downloadingPiece(pieceIndex, peer);
+					}
 				}
 				try {
-					Thread.sleep(100);
+					Thread.sleep(200);
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
@@ -79,6 +86,9 @@ public class ShareTorrent {
 		for (Peer peer : peersConnected) {
 			peersHave.add(peer);
 		}
+		if (peersHave.isEmpty()) {
+			return null;
+		}
 		int index = random.nextInt(peersHave.size());
 		return peersHave.get(index);
 	}
@@ -90,7 +100,7 @@ public class ShareTorrent {
 	public Peer nextPeer() {
 		Iterator<Peer> it = peers.iterator();
 		Peer peer = it.next();
-		it.remove();
+		peers.remove(peer);
 		return peer;
 	}
 	
@@ -225,7 +235,7 @@ public class ShareTorrent {
 	public void verifyFileCompleted(MetaFileTorrent metaFile, FileLimits fileLimits) {
 		long pieceLength = getPiecesLength();
 		int indexMin = (int) (fileLimits.limitInf / pieceLength);
-		if (fileLimits.limitInf % pieceLength == 0) {
+		if (fileLimits.limitInf % pieceLength == 0 && indexMin != 0) {
 			indexMin--;
 		}
 		int indexMax = (int) (fileLimits.limitSup / pieceLength);

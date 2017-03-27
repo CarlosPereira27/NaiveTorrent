@@ -45,6 +45,9 @@ public class CreateShareTorrent {
 
 	public boolean createFiles() throws IOException {
 		String directory = this.share.getSharePathString();
+		if (share.getSharePath().isDirectory()) {
+			directory += "/";
+		}
 		List<MetaFileTorrent> fields = share.getMetaTorrent().getInfo().getMetaFiles();
 		List<MetaFileTorrent> haveFiles = new ArrayList<>();
 		for (MetaFileTorrent mt : fields) {
@@ -67,17 +70,17 @@ public class CreateShareTorrent {
 	private void verifyHash(MetaFileTorrent mt) throws IOException {
 		FileLimits fileLimits = share.getFileLimits(mt);
 		int indexInf = (int) (fileLimits.limitInf / pieceLength);
-		if (fileLimits.limitInf % pieceLength == 0) {
+		if (fileLimits.limitInf % pieceLength == 0 && indexInf != 0) {
 			indexInf--;
 		}
 		int indexSup = (int) (fileLimits.limitSup / pieceLength);
-		if (fileLimits.limitSup % pieceLength == 0) {
+		if (fileLimits.limitSup % pieceLength == 0 && indexSup != 0) {
 			indexSup--;
 		}
 		for (int i = indexInf; i <= indexSup; i++) {
 			HashPiece hashPiece = new HashPiece(share, i);
 			if (hashPiece.check()) {
-				share.setMyBitfieldPiece(i);
+				share.setSimpleMyBitfieldPiece(i);
 			}
 		}
 	}

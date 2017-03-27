@@ -21,8 +21,11 @@ public class WritePiece {
 	private int writeFile(MetaFileTorrent metaFile, 
 			long desloc, int length, byte data[], int index) 
 					throws IOException {
-		String pathFile = shareTorrent.getSharePathString() 
-				+ metaFile.getPathFile() + ReadPiece.TORRENT_PART_FILE;
+		String pathFile = shareTorrent.getSharePathString();
+		if (shareTorrent.getSharePath().isDirectory()) {
+			pathFile += "/";
+		}
+		pathFile += metaFile.getPathFile() + ReadPiece.TORRENT_PART_FILE;
 		RandomAccessFile randomAccessFile = 
 				new RandomAccessFile(new File(pathFile), "w");
 		randomAccessFile.seek(desloc);
