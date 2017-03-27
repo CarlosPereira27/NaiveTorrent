@@ -47,7 +47,7 @@ public class MetaTorrentContract {
         public static final String ENCODING = "encoding";
         public static final String UPLOADED = "uploaded";
         public static final String DOWNLOADED = "downloaded";
-        public static final String LEFT = "downloaded";
+        public static final String LEFT = "left";
         public static final String BITFIELD = "bitfield";
         public static final String LAST_ACTIVITY = "lastActivity";
         public static final String SHARE_PATH = "sharePath";

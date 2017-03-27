@@ -263,12 +263,13 @@ public class PairedConnection implements Runnable {
 						cont = 0;
 					}
 					try {
-						Thread.sleep(20);
+						Thread.sleep(100);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
 					}
-					if (cont == 50) {
+					if (cont == 10) {
 						keepAlive();
+						cont = 0;
 					}
 					cont++;
 				}

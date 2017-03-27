@@ -464,6 +464,7 @@ public class CommandLine implements Runnable {
 			shareTorrent.setManagerTorrentRequest(managerTorrentRequest);
 			new Thread(managerTorrentRequest).start();
 			shareTorrent.init();
+			shareTorrents.add(shareTorrent);
 			System.out.println(
 					ConsoleForegroundColors.GREEN.getValue()
 					+ "Torrent ('"
@@ -477,7 +478,7 @@ public class CommandLine implements Runnable {
 					+ e.getMessage() 
 					+ Console.DEFAULT.getValue());
 
-			//e.printStackTrace();
+			e.printStackTrace();
 
 		}
 	}

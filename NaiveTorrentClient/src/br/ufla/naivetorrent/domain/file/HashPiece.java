@@ -15,6 +15,9 @@ public class HashPiece {
 
 	public HashPiece(ShareTorrent shareTorrent, int indexPiece) {
 		this.shareTorrent = shareTorrent;
+		if (indexPiece < 0) {
+			indexPiece = 0;
+		}
 		this.indexPiece = indexPiece;
 	}
 

@@ -34,7 +34,7 @@ public class PeerSocketListener implements Runnable {
 		this.me = me;
 		socketListener = new ServerSocket(me.getSocketAddressListening().getPort());
 		socketListener.setSoTimeout(10000);
-		stop.set(false);
+		stop = new AtomicBoolean(false);
 		idToShareTorrent = new ConcurrentHashMap<>();
 		idToManagerConnections = new ConcurrentHashMap<>();
 		idToStopConnection = new ConcurrentHashMap<>();

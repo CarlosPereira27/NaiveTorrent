@@ -133,6 +133,8 @@ public class ShareTorrent {
 		uploaded = new AtomicLong();
 		downloaded = new AtomicLong();
 		left = new AtomicLong();
+		pause = new AtomicBoolean(false);
+		seeder = new AtomicBoolean(false);
 	}
 	
 	private void setMetaFileData() {

@@ -100,6 +100,11 @@ public class ResponseMessageDecoder {
 		BEncoder bEncoder = new BEncoder(messageStr);
 		@SuppressWarnings("unchecked")
 		Map<String, Object> dic = (Map<String, Object>) bEncoder.read();
+		if (dic == null) {
+			responseMessageError = new ResponseMessageError();
+			responseMessageError.setFailureReason("Não foi possível obter resposta.");
+			return;
+		}
 		if (dic.containsKey(ResponseAttributes.FAILURE_REASON)) {
 			decodeMessageError(dic);
 		} else {

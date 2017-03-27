@@ -53,7 +53,7 @@ public class Display implements Runnable {
 		while (isAtiva()) {
 			try {
 				displayData();
-				Thread.sleep(3000);
+				Thread.sleep(4000);
 				if (isAtiva()) {
 					Console.CLEAR_HOME.apply();
 				}
