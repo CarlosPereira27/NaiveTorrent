@@ -97,14 +97,13 @@ public class PeerSocketListener implements Runnable {
 					continue;
 				}
 				// escrita bitfield
-				BitSet myBitfield = shareTorrent.getMyBitfield();
-				byte myBitfieldBytes[] =  myBitfield.toByteArray();
-				int length = myBitfieldBytes.length;
+				byte myBitfield[] =  shareTorrent.getMyBitfield().toByteArray();
+				int length = myBitfield.length;
 				data = new byte[length + 5];
 				int index = 0;
 				index += PairedConnection.copyArray(data, length + 1, index);
 				data[index++] = 5;
-				index = PairedConnection.copyArray(data, myBitfield.toByteArray(), index);
+				index = PairedConnection.copyArray(data, myBitfield, index);
 				out.write(data);
 				out.flush();
 				// leitura bitfield

@@ -42,9 +42,8 @@ public class HandshakeHandler implements Runnable {
 				me.getId()).toByteArray());
 		out.flush();
 		// read bitfield message
-		BitSet myBitfield = shareTorrent.getMyBitfield();
-		byte myBitfieldBytes[] =  myBitfield.toByteArray();
-		int length = myBitfieldBytes.length;
+		byte myBitfield[] =  shareTorrent.getMyBitfield().toByteArray();
+		int length = myBitfield.length;
 		byte peerBitfield[] = new byte[length + 5];
 		InputStream in = socket.getInputStream();
 		int lengthRead = in.read(peerBitfield);
@@ -76,8 +75,7 @@ public class HandshakeHandler implements Runnable {
 		int index = 0;
 		index += PairedConnection.copyArray(data, length + 1, index);
 		data[index++] = 5;
-		index = PairedConnection.copyArray(data, shareTorrent
-				.getMyBitfield().toByteArray(), index);
+		index = PairedConnection.copyArray(data, myBitfield, index);
 		out.write(data);
 		out.flush();
 		// abre conexão

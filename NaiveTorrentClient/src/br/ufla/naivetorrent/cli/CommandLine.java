@@ -166,9 +166,11 @@ public class CommandLine implements Runnable {
 		BitSet bitfield = sharetorrent.getMyBitfield();
 		String caractere = "\u2587";
 		System.out.println("\n");
-		for (int i = 0; i < bitfield.length(); i++) {
+		int n = sharetorrent.getNumPieces();
+		System.out.println(sharetorrent + " " + n + ", " + sharetorrent.getNumPieces());
+		for (int i = 0; i < n; i++) {
 			/**
-			 * se o bitfield for 1 quer dizer que o usuario ja tem aquele pedaco
+			 * se o bitfield for True quer dizer que o usuario ja tem aquele pedaco
 			 */
 			if (bitfield.get(i)) {
 				System.out.print(
@@ -450,8 +452,8 @@ public class CommandLine implements Runnable {
 			MetaTorrent metaTorrent = readTorrent.read();
 			ShareTorrent shareTorrent = new ShareTorrent();
 			shareTorrent.setMe(me);
-			shareTorrent.setMetaTorrent(metaTorrent);
 			shareTorrent.setSharePath(shareFile);
+			shareTorrent.setMetaTorrent(metaTorrent);
 			CreateShareTorrent createShareTorrent = new CreateShareTorrent(shareTorrent);
 			createShareTorrent.createFiles();
 			shareTorrent.setPeerSocketListener(peerSocketListener);
@@ -505,13 +507,10 @@ public class CommandLine implements Runnable {
 			
 			try {
 				
-				List<ShareTorrent> sharetorrents  = new ArrayList<>();
-				
-				sharetorrents = new DaoRecoveryShareTorrents().getShareTorrents();
 				
 				
-				for(int i=0;i<sharetorrents.size();i++){
-					System.out.println("id: "+i+" "+sharetorrents.get(i).getSharePath().getName());
+				for(int i=0;i<shareTorrents.size();i++){
+					System.out.println("id: "+i+" "+shareTorrents.get(i).getSharePath().getName());
 				}
 								
 				
@@ -533,23 +532,23 @@ public class CommandLine implements Runnable {
 			
 			extcommands.readCmd();
 			
-			@SuppressWarnings("unused")
 			int id = extcommands.readParameterInt();
 			
-			//List<ShareTorrent> sharetorrents  = new ArrayList<>();
-			
-			//sharetorrents = new DaoRecoveryShareTorrents().getShareTorrents();
+			if (id >= shareTorrents.size() || id < 0) {
+				throw new Exception("Erro! Id inválido (" + id + ")!");
+			}
 			
 			//teste
-			ShareTorrent sharetorrent = new ShareTorrent();
-			sharetorrent.setMyBitfield(new BitSet(10));
-			sharetorrent.getMyBitfield().set(3);
-			sharetorrent.getMyBitfield().set(10);
-			showBitfield(sharetorrent);
+//			ShareTorrent sharetorrent = new ShareTorrent();
+//			sharetorrent.setMyBitfield(new BitSet(10));
+//			sharetorrent.getMyBitfield().set(3);
+//			sharetorrent.getMyBitfield().set(10);
+//
+//			showBitfield(sharetorrent);
 			//		
 
 			
-			//showBitfield(sharetorrents.get(id));
+			showBitfield(shareTorrents.get(id));
 			
 		} catch (Exception e) {
 			

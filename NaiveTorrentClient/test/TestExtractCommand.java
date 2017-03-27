@@ -3,6 +3,7 @@ import static org.junit.Assert.*;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.BitSet;
 import java.util.List;
 
 import org.junit.Test;
@@ -20,6 +21,9 @@ public class TestExtractCommand {
 		File file2 = new File(file.getPath() + "/" + str2);
 		System.out.println(file2.getPath());
 		System.out.println(file.exists());
+		BitSet myBitfield = new BitSet(50);
+		System.out.println(myBitfield.size());
+		System.out.println(myBitfield.toByteArray().length);
 		
 	}
 	

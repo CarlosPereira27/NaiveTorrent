@@ -15,9 +15,6 @@ public class HashPiece {
 
 	public HashPiece(ShareTorrent shareTorrent, int indexPiece) {
 		this.shareTorrent = shareTorrent;
-		if (indexPiece < 0) {
-			indexPiece = 0;
-		}
 		this.indexPiece = indexPiece;
 	}
 
@@ -43,7 +40,7 @@ public class HashPiece {
 	}
 
 	public boolean check() throws IOException {
-		int lengthPiece = shareTorrent.getMetaTorrent().getInfo().getPiecesLength();
+		int lengthPiece = shareTorrent.getPiecesLength();
 		long initPointer = ((long) indexPiece * (long) lengthPiece);
 		long finalPointer = initPointer + lengthPiece;
 		MessageDigest messageDigest = null;
@@ -58,11 +55,11 @@ public class HashPiece {
 			MetaFileTorrent metaFile = entry.getKey();
 			if (fileLimits.limitSup > initPointer) {
 				long desloc = 0;
-				if (fileLimits.limitInf <= initPointer) {
+				if (fileLimits.limitInf < initPointer) {
 					desloc = initPointer - fileLimits.limitInf;
 				}
 				int length = (int) (Math.min(fileLimits.limitSup, finalPointer)
-						- fileLimits.limitInf);
+						- Math.max(fileLimits.limitInf, initPointer));
 				updateDigestFile(metaFile, desloc, length, messageDigest);
 			}
 		}

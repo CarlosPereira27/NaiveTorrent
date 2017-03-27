@@ -4,9 +4,12 @@ import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Test;
 
+import br.ufla.naivetorrent.domain.file.HashPiece;
+import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
@@ -80,6 +83,47 @@ public class TestGenerateTorrent {
 		
 		// VERIFICAO
 		assertEquals(metaTorrentCreated, metaTorrentRead);
+	}
+	
+	@Test
+	public void readFileTest2() 
+			throws Exception {
+		File shareFile = new File("/home/carlos/Documents/teste/"
+				+ "2015apostilalfa-150311090027-conversion-gate01.pdf");
+		File torrentFile = new File("/home/carlos/apostila.torrent");
+		ExtractMetaInfo extractMetaInfo = new ExtractMetaInfo(shareFile);
+		extractMetaInfo.setCreatedBy("Carlos Henrique Pereira");
+		extractMetaInfo.setComment("hello world");
+		extractMetaInfo.setEncoding("utf-8");
+		Tracker tracker1 = new Tracker();
+		tracker1.setAddressListening(new InetSocketAddress("127.0.0.1", 8084));
+		extractMetaInfo.setTrackers(Arrays.asList(tracker1));
+		MetaTorrent metaTorrentCreated = extractMetaInfo.generateMetaTorrent();
+		CreateTorrent createTorrent = new CreateTorrent(metaTorrentCreated,
+				torrentFile);
+		createTorrent.create();
+		ReadTorrent readTorrent = new ReadTorrent(torrentFile);
+		MetaTorrent metaTorrentRead = readTorrent.read();
+		shareFile.renameTo(new File("/home/carlos/Documents/teste/"
+				+ "2015apostilalfa-150311090027-conversion-gate01.pdf.part"));
+		// VERIFICAO
+		assertEquals(metaTorrentCreated, metaTorrentRead);
+		int n = (int) (metaTorrentRead.getLenghtTorrent()
+				/ metaTorrentRead.getPiecesLength());
+		ShareTorrent shareTorrent = new ShareTorrent();
+		shareTorrent.setSharePath(new File("/home/carlos/Documents/teste/"));
+		shareTorrent.setMetaTorrent(metaTorrentRead);
+//		List<MetaFileTorrent> metaFiles = 
+//				metaTorrentCreated.getInfo().getMetaFiles();
+//		for (MetaFileTorrent metaFile : metaFiles) {
+//			shareTorrent.setMetaFileCompleted(metaFile);
+//		}
+		for (int i = 0; i < n; i++) {
+			HashPiece hashPiece = new HashPiece(shareTorrent, i);
+			assertEquals(true, hashPiece.check());
+		}
+		CreateShareTorrent createShareTorrent = new CreateShareTorrent(shareTorrent);
+		createShareTorrent.createFiles();
 	}
 	
 	@Test

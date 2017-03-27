@@ -170,12 +170,13 @@ public class PairedConnection implements Runnable {
 	 * Envia o bitfield.
 	 */
 	public void sendBitfield() {
-		int length = shareTorrent.getMyBitfield().toByteArray().length;
+		byte[] bitfield = shareTorrent.getMyBitfield().toByteArray();
+		int length = bitfield.length;
 		byte data[] = new byte[length + 5];
 		int index = 0;
 		index += copyArray(data, length + 1, index);
 		data[index++] = 5;
-		index = copyArray(data, shareTorrent.getMyBitfield().toByteArray(), index);
+		index = copyArray(data, bitfield, index);
 		try {
 			myOutputStream.write(data);
 			myOutputStream.flush();
@@ -188,12 +189,13 @@ public class PairedConnection implements Runnable {
 	 * Recebe o bitfield.
 	 */
 	public void receiveBitfield() {
-		int length = shareTorrent.getMyBitfield().toByteArray().length;
+		byte[] bitfield = shareTorrent.getMyBitfield().toByteArray();
+		int length = bitfield.length;
 		byte data[] = new byte[length + 5];
 		int index = 0;
 		index += copyArray(data, length + 1, index);
 		data[index++] = 5;
-		index = copyArray(data, shareTorrent.getMyBitfield().toByteArray(), index);
+		index = copyArray(data, bitfield, index);
 		try {
 			myOutputStream.write(data);
 			myOutputStream.flush();

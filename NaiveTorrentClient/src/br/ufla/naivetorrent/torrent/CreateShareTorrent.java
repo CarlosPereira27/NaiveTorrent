@@ -48,9 +48,9 @@ public class CreateShareTorrent {
 		if (share.getSharePath().isDirectory()) {
 			directory += "/";
 		}
-		List<MetaFileTorrent> fields = share.getMetaTorrent().getInfo().getMetaFiles();
+		List<MetaFileTorrent> files = share.getMetaTorrent().getInfo().getMetaFiles();
 		List<MetaFileTorrent> haveFiles = new ArrayList<>();
-		for (MetaFileTorrent mt : fields) {
+		for (MetaFileTorrent mt : files) {
 			verifyFile(directory, mt);
 			File fileCreate = new File(directory + mt.getPathFile() + PART_EXTENSION);
 			if (!fileCreate.exists()) {
@@ -79,8 +79,12 @@ public class CreateShareTorrent {
 		}
 		for (int i = indexInf; i <= indexSup; i++) {
 			HashPiece hashPiece = new HashPiece(share, i);
+			System.out.print(i);
 			if (hashPiece.check()) {
+				System.out.println("check");
 				share.setSimpleMyBitfieldPiece(i);
+			} else {
+				System.out.println("not check");
 			}
 		}
 	}

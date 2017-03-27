@@ -14,7 +14,6 @@ public class ExtractCommandsIds extends ExtractCommand {
 	public int readParameterInt() 
 			throws Exception  {
 		
-		int parameter = -1;
 		
 		// não possui parâmetro
 		if (index > tokens.length) {
@@ -24,8 +23,7 @@ public class ExtractCommandsIds extends ExtractCommand {
 		
 		try{
 			
-		 Integer.parseInt(tokens[index]);
-		 return parameter;
+		 return Integer.parseInt(tokens[index]);
 			
 		}
 		catch(Exception e){

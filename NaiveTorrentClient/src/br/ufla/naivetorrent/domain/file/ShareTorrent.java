@@ -479,9 +479,9 @@ public class ShareTorrent {
 		this.metaTorrent = metaTorrent;
 		setMetaFileData();
 	}
-	public void setMyBitfield(BitSet myBitfield) {
-		this.myBitfield = myBitfield;
-	}
+//	public void setMyBitfield(BitSet myBitfield) {
+//		this.myBitfield = myBitfield;
+//	}
 	public void setLastActivity(Date lastActivity) {
 		this.lastActivity = lastActivity;
 	}
