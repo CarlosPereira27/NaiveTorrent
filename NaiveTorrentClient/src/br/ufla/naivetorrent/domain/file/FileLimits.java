@@ -2,8 +2,8 @@ package br.ufla.naivetorrent.domain.file;
 
 public class FileLimits {
 	
-	long limitInf;
-	long limitSup;
+	public long limitInf;
+	public long limitSup;
 	
 	
 	public FileLimits(long limitInf, long limitSup) {

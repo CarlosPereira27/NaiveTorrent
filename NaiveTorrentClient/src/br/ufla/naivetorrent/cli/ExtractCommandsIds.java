@@ -11,7 +11,7 @@ public class ExtractCommandsIds extends ExtractCommand {
 	}
 	
 	
-	public int readParameterint() 
+	public int readParameterInt() 
 			throws Exception  {
 		
 		int parameter = -1;

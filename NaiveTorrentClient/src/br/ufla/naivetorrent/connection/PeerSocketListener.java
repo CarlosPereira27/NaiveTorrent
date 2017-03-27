@@ -61,6 +61,12 @@ public class PeerSocketListener implements Runnable {
 			PairedConnection connection) {
 		idToManagerConnections.get(infoHash).putConnection(connection);
 	}
+	
+	public void putShareTorrent(ShareTorrent shareTorrent) {
+		ByteBuffer id = shareTorrent.getMetaTorrent().getInfoHash();
+		idToShareTorrent.put(id, shareTorrent);
+		idToManagerConnections.put(id, shareTorrent.getManagerConnections());
+	}
 
 	@Override
 	public void run() {

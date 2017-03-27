@@ -3,33 +3,28 @@ package br.ufla.naivetorrent.torrent;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.List;
 
+import br.ufla.naivetorrent.domain.file.FileLimits;
+import br.ufla.naivetorrent.domain.file.HashPiece;
 import br.ufla.naivetorrent.domain.file.MetaFileTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 
 public class CreateShareTorrent {
 
-	private ShareTorrent share;
-	private byte lastPiece[];
 	public static final String PART_EXTENSION = ".part";
-	private int sizeMetaInfo;
+	private ShareTorrent share;
+	private int pieceLength;
 
 	public CreateShareTorrent(ShareTorrent share) {
 		this.share = share;	
+		pieceLength = share.getPiecesLength();
 	}
 
 	private boolean createSingleFile(File fileCreate) {
 		String path = fileCreate.getPath();
 		File dir = new File(path.substring(0, path.lastIndexOf('/')));
-		// File fileCreate = new File(path + PART_EXTENSION);
-		// System.out.println(path);
-		// System.out.println(dir.getPath());
-		// fileCreate = new File(fileCreate.getPath());
 		try {
 			dir.mkdirs();
 			return fileCreate.createNewFile();
@@ -40,62 +35,66 @@ public class CreateShareTorrent {
 		}
 		return true;
 	}
+	
+	private void verifyFile(String directory, MetaFileTorrent mt) {
+		File fileFull = new File(directory + mt.getPathFile());
+		if (fileFull.exists()) {
+			fileFull.renameTo(new File(fileFull.getPath() + PART_EXTENSION));
+		}
+	}
 
-	public boolean createFiles() {
-		String directory = this.share.getSharePath().getPath();
-		BitSet myBitSet = null;
-		// System.out.println(directory);
-		this.sizeMetaInfo = share.getMetaTorrent().getInfo().getPiecesLength();
+	public boolean createFiles() throws IOException {
+		String directory = this.share.getSharePathString();
 		List<MetaFileTorrent> fields = share.getMetaTorrent().getInfo().getMetaFiles();
-		// System.out.println(fields.size());
-		int i = 0;
+		List<MetaFileTorrent> haveFiles = new ArrayList<>();
 		for (MetaFileTorrent mt : fields) {
-			// System.out.println(mt.getPathFile());
-			String path = new String(directory + mt.getPathFile());
-			File fileFull = new File(path);
-
-			 if (fileFull.exists()) {
-				 fileFull.renameTo(new File(path + PART_EXTENSION));
-			 }
-
-			File fileCreate = new File(path + PART_EXTENSION);
-
+			verifyFile(directory, mt);
+			File fileCreate = new File(directory + mt.getPathFile() + PART_EXTENSION);
 			if (!fileCreate.exists()) {
-				System.out.println(path);
 				createSingleFile(fileCreate);
-				writeFile(path + PART_EXTENSION, mt.getLength());
-				// writePeace(path + PART_EXTENSION, blankByte);
+				writeFile(fileCreate, mt.getLength());
 			} else {
-				readFile(fileCreate, i);
+				haveFiles.add(mt);
+				verifyHash(mt);
 			}
-			i++;
 		}
-		long pieceSize = (long) share.getMetaTorrent().getInfo().getPiecesLength();
-		long torrentSize = share.getMetaTorrent().getInfo().getLenghtTorrent();
-		int size = (int) (torrentSize / pieceSize);
-		if (torrentSize % pieceSize != 0) {
-			size++;
+		for (MetaFileTorrent mt : haveFiles) {
+			share.verifyFileCompleted(mt, share.getFileLimits(mt));
 		}
-		myBitSet = new BitSet(size);
-		share.setMyBitfield(myBitSet);
-		System.out.println(share.getMyBitfield().size());
-
 		return true;
 	}
-
-	private void writeFile(String path, long sizeFile) {
-		long i;
-		for (i = 0l; i +  sizeMetaInfo < sizeFile; i += sizeMetaInfo) {
-			writePeace(path, new byte[sizeMetaInfo]);
+	
+	private void verifyHash(MetaFileTorrent mt) throws IOException {
+		FileLimits fileLimits = share.getFileLimits(mt);
+		int indexInf = (int) (fileLimits.limitInf / pieceLength);
+		if (fileLimits.limitInf % pieceLength == 0) {
+			indexInf--;
 		}
-		writePeace(path, new byte[(int) (sizeFile - i)]);
+		int indexSup = (int) (fileLimits.limitSup / pieceLength);
+		if (fileLimits.limitSup % pieceLength == 0) {
+			indexSup--;
+		}
+		for (int i = indexInf; i <= indexSup; i++) {
+			HashPiece hashPiece = new HashPiece(share, i);
+			if (hashPiece.check()) {
+				share.setMyBitfieldPiece(i);
+			}
+		}
 	}
 
-	private boolean writePeace(String path, byte[] peaceByteArray) {
+	private void writeFile(File file, long sizeFile) {
+		long i;
+		for (i = 0l; i + pieceLength < sizeFile; i += pieceLength) {
+			writePeace(file, new byte[pieceLength]);
+		}
+		writePeace(file, new byte[(int) (sizeFile - i)]);
+	}
+
+	private boolean writePeace(File file, byte[] pieceByteArray) {
 		FileOutputStream output = null;
 		try {
-			output = new FileOutputStream(path, true);
-			output.write(peaceByteArray);
+			output = new FileOutputStream(file, true);
+			output.write(pieceByteArray);
 			output.flush();
 			output.close();
 			return true;
@@ -105,25 +104,4 @@ public class CreateShareTorrent {
 		return false;
 	}
 
-	private void readFile(File file, long indexFile) {
-		readPeace(file, indexFile, sizeMetaInfo);
-	}
-
-	private void readPeace(File file, long desloc, int lengthRead) {
-		long length = file.length();
-		if (lengthRead > (length - desloc)) {
-			lengthRead = (int) (length - desloc);
-		}
-		try {
-			RandomAccessFile raFile = new RandomAccessFile(file, "r");
-			raFile.seek(desloc);
-			lastPiece = new byte[lengthRead];
-			raFile.read(lastPiece);
-			raFile.close();
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-		}
-		// Comparar o pedaco com HashPeace e setar op bitSet do pedaco
-	}
 }

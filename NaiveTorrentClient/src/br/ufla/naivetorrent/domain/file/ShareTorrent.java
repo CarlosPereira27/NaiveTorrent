@@ -24,6 +24,7 @@ import br.ufla.naivetorrent.domain.peer.Peer;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
 import br.ufla.naivetorrent.peer.protocol.DownloadStrategy;
 import br.ufla.naivetorrent.peer.protocol.HandshakeHandler;
+import br.ufla.naivetorrent.tracker.request.ManagerTorrentRequest;
 import br.ufla.naivetorrent.util.UtilByteString;
 
 public class ShareTorrent {
@@ -57,6 +58,7 @@ public class ShareTorrent {
 				if (!nextDownloadPieces.isEmpty() && 
 						onDonwloading.size() < MAX_DOWNLOADING) {
 					int pieceIndex = getNextPiece();
+					myBitfieldNextDownloading.set(pieceIndex);
 					onDonwloading.add(pieceIndex);
 					Peer peer = getPeerHave(pieceIndex);
 					managerConnections.downloadingPiece(pieceIndex, peer);
@@ -92,8 +94,10 @@ public class ShareTorrent {
 		return peer;
 	}
 	
-	private PeerSocketListener peerSocketListener;
+
+	private ManagerTorrentRequest managerTorrentRequest;
 	private ManagerConnections managerConnections;
+	private PeerSocketListener peerSocketListener;
 	private Peer me;
 	private DownloadStrategy downloadStrategy;
 	private List<Integer> nextDownloadPieces;
@@ -140,6 +144,19 @@ public class ShareTorrent {
 			fileIsCompleted.put(metaFile, false);
 			limit += metaFile.getLength();
 		}
+		int numPieces = getNumPieces();
+		myBitfield = new BitSet(numPieces);
+		myBitfieldNextDownloading = new BitSet(numPieces);
+	}
+	
+	public int getNumPieces() {
+		long torrentLength = metaTorrent.getLenghtTorrent();
+		long piecesLength = metaTorrent.getPiecesLength();
+		int numPieces = (int) (torrentLength / piecesLength);
+		if (torrentLength % piecesLength != 0) {
+			numPieces++;
+		}
+		return numPieces;
 	}
 	
 	public BitSet getMyBitfieldWithNext() {
@@ -192,6 +209,7 @@ public class ShareTorrent {
 	public void backToDownload(Integer index) {
 		onDonwloading.remove(index);
 		nextDownloadPieces.add(index);
+		myBitfieldNextDownloading.set(index, false);
 	}
 	
 	public void setMetaFileCompleted(MetaFileTorrent metaFile) {
@@ -205,6 +223,9 @@ public class ShareTorrent {
 	public void verifyFileCompleted(MetaFileTorrent metaFile, FileLimits fileLimits) {
 		long pieceLength = getPiecesLength();
 		int indexMin = (int) (fileLimits.limitInf / pieceLength);
+		if (fileLimits.limitInf % pieceLength == 0) {
+			indexMin--;
+		}
 		int indexMax = (int) (fileLimits.limitSup / pieceLength);
 		synchronized (myBitfield) {
 			for (int i = indexMin; i <= indexMax; i++) {
@@ -214,7 +235,6 @@ public class ShareTorrent {
 			}
 		}
 		setMetaFileCompleted(metaFile);
-
 	}
 	
 	public void verifyFileCompleted(int index) {
@@ -234,6 +254,12 @@ public class ShareTorrent {
 		}
 	}
 	
+	public void setSimpleMyBitfieldPiece(int index) {
+		synchronized (myBitfield) {
+			myBitfield.set(index);
+		}
+	}
+	
 	public void setMyBitfieldPiece(int index) {
 		onDonwloading.remove(new Integer(index));
 		synchronized (myBitfield) {
@@ -241,6 +267,10 @@ public class ShareTorrent {
 		}
 		managerConnections.multicastHave(index);
 		verifyFileCompleted(index);
+	}
+	
+	public FileLimits getFileLimits(MetaFileTorrent metaFileTorrent) {
+		return fileToLimits.get(metaFileTorrent);
 	}
 	
 
@@ -253,9 +283,10 @@ public class ShareTorrent {
 		return fileIsCompleted.get(metaFile);
 	}
 	
-	@SuppressWarnings("unused")
-	private void init() {
-		
+
+	public void init() {
+		new Thread(new SimpleManagerConnection()).start();
+		new Thread(new SimpleManagerDownload()).start();
 	}
 
 	public void setPeerBitfield(Peer peer, int index) {
@@ -459,9 +490,30 @@ public class ShareTorrent {
 	public void setSeeder(boolean seeder) {
 		this.seeder.set(seeder);
 	}
-
-
-
 	
+	public ManagerConnections getManagerConnections() {
+		return managerConnections;
+	}
+
+	public void setManagerConnections(ManagerConnections managerConnections) {
+		this.managerConnections = managerConnections;
+	}
+
+	public PeerSocketListener getPeerSocketListener() {
+		return peerSocketListener;
+	}
+
+	public void setPeerSocketListener(PeerSocketListener peerSocketListener) {
+		this.peerSocketListener = peerSocketListener;
+	}
+
+	public ManagerTorrentRequest getManagerTorrentRequest() {
+		return managerTorrentRequest;
+	}
+
+	public void setManagerTorrentRequest(ManagerTorrentRequest managerTorrentRequest) {
+		this.managerTorrentRequest = managerTorrentRequest;
+	}
+
 
 }
