@@ -47,13 +47,14 @@ public class DaoRecoveryShareTorrents {
 				shareTorrent.setMyBitfieldString(rs.getString(MetaTorrentContract.Columns.COMMENT));
 				metaTorrent.setCreatedBy(rs.getString(MetaTorrentContract.Columns.CREATED_BY));
 				metaTorrent.setCreationDateTime(rs.getLong(MetaTorrentContract.Columns.CREATION_DATE));
-				shareTorrent.setDownloaded(rs.getInt(MetaTorrentContract.Columns.DOWNLOADED));
+				shareTorrent.setDownloaded(rs.getLong(MetaTorrentContract.Columns.DOWNLOADED));
+				shareTorrent.setLeft(rs.getLong(MetaTorrentContract.Columns.LEFT));
 				metaTorrent.setEncoding(rs.getString(MetaTorrentContract.Columns.ENCODING));
 				idTorrent = rs.getInt(MetaTorrentContract.Columns.ID);
 				metaTorrent.setInfoHash(rs.getString(MetaTorrentContract.Columns.INFO_HASH));
 				shareTorrent.setLastActivityTime(rs.getLong(MetaTorrentContract.Columns.LAST_ACTIVITY));
 				shareTorrent.setSharePathString(rs.getString(MetaTorrentContract.Columns.SHARE_PATH));
-				shareTorrent.setUploaded(rs.getInt(MetaTorrentContract.Columns.UPLOADED));
+				shareTorrent.setUploaded(rs.getLong(MetaTorrentContract.Columns.UPLOADED));
 				metaTorrent.setTrackers(getTrackers(idTorrent));
 				idMetaInfo = getIdMetaInfo(idTorrent);
 				metaInfoTorrent = getMetaInfo(idMetaInfo);

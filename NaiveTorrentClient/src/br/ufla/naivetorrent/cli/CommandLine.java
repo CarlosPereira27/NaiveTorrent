@@ -7,10 +7,18 @@
 package br.ufla.naivetorrent.cli;
 
 import java.io.File;
+import java.net.Inet4Address;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
+import java.net.NetworkInterface;
+import java.net.Socket;
+import java.net.SocketException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.Enumeration;
 import java.util.List;
+import java.util.Random;
 import java.util.Scanner;
 
 import org.junit.Test;
@@ -19,11 +27,13 @@ import br.ufla.naivetorrent.cli.console.Console;
 import br.ufla.naivetorrent.cli.console.ConsoleForegroundColors;
 import br.ufla.naivetorrent.domain.file.MetaTorrent;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
+import br.ufla.naivetorrent.domain.peer.Peer;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
 import br.ufla.naivetorrent.persistance.CreateDatabase;
 import br.ufla.naivetorrent.persistance.DaoRecoveryShareTorrents;
 import br.ufla.naivetorrent.torrent.CreateTorrent;
 import br.ufla.naivetorrent.torrent.ExtractMetaInfo;
+import br.ufla.naivetorrent.util.UtilGenerateId;
 
 /**
  * 
@@ -31,6 +41,8 @@ import br.ufla.naivetorrent.torrent.ExtractMetaInfo;
  */
 public class CommandLine implements Runnable {
 
+	public static final int PORT_MIN = 6881;
+	public static final int PORT_MAX = 6999;
 	public static final String CREATE_TORRENT = "create-torrent";
 	public static final String ADD_TORRENT = "add-torrent";
 	public static final String PLAY = "play";
@@ -72,12 +84,42 @@ public class CommandLine implements Runnable {
 	private Scanner scanner;
 	private String[] commandTokens;
 	private List<ShareTorrent> shareTorrents;
-	
-	
+	private Peer me;
+	private Random random;
+		
 
 	public CommandLine() {
+		random = new Random();
 		scanner = new Scanner(System.in);
 		shareTorrents = new ArrayList<>();
+		me = new Peer();
+		me.setSocketAddressListening(getInetSocketAddress());
+		me.setId(UtilGenerateId.generateId(me.getIpOrHostName(), me.getPort()));
+	}
+	
+	/**
+	 * Identifica o endereço do socket em que o cliente está escutando.
+	 * @return endereço do socket em que o cliente está escutando
+	 */
+	private InetSocketAddress getInetSocketAddress() {
+		Enumeration<NetworkInterface> e;
+		try {
+			e = NetworkInterface.getNetworkInterfaces();
+			while(e.hasMoreElements()) {
+			    NetworkInterface n = e.nextElement();
+			    Enumeration<InetAddress> ee = n.getInetAddresses();
+			    
+			    while (ee.hasMoreElements()) {
+			        InetAddress i = ee.nextElement();
+			        if (i.isSiteLocalAddress() && i instanceof Inet4Address) {
+			        	return new InetSocketAddress(i, PORT_MIN + random.nextInt(PORT_MAX));
+			        }
+			    }
+			}
+		} catch (SocketException e1) {
+			e1.printStackTrace();
+		}
+		return null;
 	}
 
 	/**

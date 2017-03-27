@@ -18,16 +18,18 @@ public class HttpRequest implements Runnable {
 	private static final String PROTOCOL = "http://";
 	private static final String SERVLET = "/tracker";
 	private static final String PROJECT = "/servidornaivetorrent";
-	@SuppressWarnings("unused")
 	private Tracker tracker;
 	private RequestMessage requestMessage;
 	private StringBuilder sbURL;
 	private StringBuilder sbResponse;
 	private int numParameters;
+	private ManagerTorrentRequest managerTorrentRequest;
 	
-	public HttpRequest(Tracker tracker, RequestMessage requestMessage) {
+	public HttpRequest(Tracker tracker, RequestMessage requestMessage, 
+			ManagerTorrentRequest managerTorrentRequest) {
 		this.tracker = tracker;
 		this.requestMessage = requestMessage;
+		this.managerTorrentRequest = managerTorrentRequest;
 		numParameters = 0;
 		sbURL = new StringBuilder();
 		sbResponse = new StringBuilder();
@@ -114,7 +116,7 @@ public class HttpRequest implements Runnable {
 			} else {
 				ResponseMessage responseMessage = 
 					responseMessageDecoder.getResponseMessage();
-				System.out.println(responseMessage);
+				managerTorrentRequest.updateResponse(responseMessage, tracker);
 			}
 		} else {
 			

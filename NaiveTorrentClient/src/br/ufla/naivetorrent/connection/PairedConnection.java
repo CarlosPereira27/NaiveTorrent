@@ -6,6 +6,8 @@ import java.io.OutputStream;
 import java.math.BigInteger;
 import java.net.Socket;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import br.ufla.naivetorrent.domain.file.BlockOfPiece;
 import br.ufla.naivetorrent.domain.file.HashPiece;
@@ -24,52 +26,44 @@ public class PairedConnection implements Runnable {
 	private InputStream mySocketInput;
 	private byte read[];
 	private static int MAX_MESSAGE = 17;
+	private Queue<Message> sendQueue;
 	
+	// CONSTRUCTOR
 	public PairedConnection(ShareTorrent shareTorrent, Peer peer, 
 			Socket mySocket) 
 					throws IOException {
 		this.shareTorrent = shareTorrent;
 		this.peer = peer;
 		this.mySocket = mySocket;
+		sendQueue = new LinkedList<>();
 		mySocketInput = mySocket.getInputStream();
 		myOutputStream = mySocket.getOutputStream();
+	}
+	
+	public void addSendMessage(Message message) {
+		synchronized (sendQueue) {
+			sendQueue.offer(message);
+		}
+	}
+	
+	public boolean haveSendMessage() {
+		synchronized (sendQueue) {
+			return !sendQueue.isEmpty();
+		}
+	}
+	
+	public Message nextMessage() {
+		synchronized (sendQueue) {
+			return sendQueue.poll();
+		}
 	}
 	
 	public Peer getPeer() {
 		return peer;
 	}
 	
-	/**
-	 * Realiza a copia dos bytes de um array de bytes para um buffer de dados em um 
-	 * determinado índice.
-	 * @param data
-	 * @param val
-	 * @param index
-	 * @return
-	 */
-	public static int copyArray(byte data[], byte dataCp[], int index) {
-		int n = dataCp.length;
-		for (int i = 0; i < n; i++) {
-			data[index + i] = dataCp[i];
-		}
-		return index + n;
-	}
-	
-	/**
-	 * Realiza a copia dos bytes de um inteiro para um buffer de dados em um 
-	 * determinado índice.
-	 * @param data
-	 * @param val
-	 * @param index
-	 * @return
-	 */
-	public static int copyArray(byte data[], int val, int index) {
-		byte dataCp[] = BigInteger.valueOf(val).toByteArray();
-		int n = dataCp.length;
-		for (int i = 0; i < 4 - n; i++) {
-			data[index++] = 0;
-		}
-		return copyArray(data, dataCp, index);
+	public void requestPiece(Message message) {
+		requestPiece(message.index, message.begin, message.length);
 	}
 	
 	/**
@@ -86,15 +80,16 @@ public class PairedConnection implements Runnable {
 		indexDt = copyArray(data, index, indexDt);
 		indexDt = copyArray(data, begin, indexDt);
 		indexDt = copyArray(data, length, indexDt);
-		synchronized (myOutputStream) {
-			try {
-				myOutputStream.write(data);
-				myOutputStream.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+		try {
+			myOutputStream.write(data);
+			myOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
+	}
+	
+	public void cancelPiece(Message message) {
+		cancelPiece(message.index, message.begin, message.length);
 	}
 	
 	/**
@@ -111,29 +106,37 @@ public class PairedConnection implements Runnable {
 		indexDt = copyArray(data, index, indexDt);
 		indexDt = copyArray(data, begin, indexDt);
 		indexDt = copyArray(data, length, indexDt);
-		synchronized (myOutputStream) {
-			try {
-				myOutputStream.write(data);
-				myOutputStream.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+		try {
+			myOutputStream.write(data);
+			myOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
 	/**
 	 * Mantém a conexão viva
 	 */
-	public void keepAlive() {
-		synchronized (myOutputStream) {
-			try {
-				myOutputStream.write(new byte[4]);
-				myOutputStream.flush();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
+	private void keepAlive() {
+		try {
+			myOutputStream.write(new byte[4]);
+			myOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	private void have(int index) {
+		byte data[] = new byte[9];
+		int indexDt = 0;
+		indexDt = copyArray(data, 5, indexDt);
+		data[indexDt++] = 4;
+		indexDt = copyArray(data, index, indexDt);
+		try {
+			myOutputStream.write(data);
+			myOutputStream.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 	
@@ -174,10 +177,8 @@ public class PairedConnection implements Runnable {
 		data[index++] = 5;
 		index = copyArray(data, shareTorrent.getMyBitfield().toByteArray(), index);
 		try {
-			synchronized (myOutputStream) {
-				myOutputStream.write(data);
-				myOutputStream.flush();
-			}
+			myOutputStream.write(data);
+			myOutputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -194,10 +195,8 @@ public class PairedConnection implements Runnable {
 		data[index++] = 5;
 		index = copyArray(data, shareTorrent.getMyBitfield().toByteArray(), index);
 		try {
-			synchronized (myOutputStream) {
-				myOutputStream.write(data);
-				myOutputStream.flush();
-			}
+			myOutputStream.write(data);
+			myOutputStream.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -227,6 +226,25 @@ public class PairedConnection implements Runnable {
 		}
 	}
 	
+	public void sendMessage(Message message) {
+		switch(message.id) {
+		case -1:
+			keepAlive();
+			break;
+		case 4:
+			have(message.index);
+			break;
+		case 5:
+			sendBitfield();
+			break;
+		case 6:
+			requestPiece(message);
+			break;
+		case 8:
+			cancelPiece(message);
+			break;
+		}
+	}
 
 	/**
 	 * Escuta o peer da conexão.
@@ -235,7 +253,25 @@ public class PairedConnection implements Runnable {
 	public void run() {
 		while (true) {
 			read = new byte[MAX_MESSAGE];
+			int cont;
 			try {
+				cont = 0;
+				while (mySocketInput.available() == 0) {
+					Message message = nextMessage();
+					if (message != null) {
+						sendMessage(message);
+						cont = 0;
+					}
+					try {
+						Thread.sleep(20);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					if (cont == 50) {
+						keepAlive();
+					}
+					cont++;
+				}
 				int bytesRead = mySocketInput.read(read);
 				if (bytesRead < 4) {
 					break;
@@ -259,43 +295,23 @@ public class PairedConnection implements Runnable {
 								Arrays.copyOfRange(read, 13, 17)).intValue();
 					}
 				}
-				final int indexF = index;
-				final int beginF = begin;
-				final int lengthF = length;
 				switch (messageId) {
 				case 4:
 					shareTorrent.setPeerBitfield(peer, index);
 					break;
 				case 5:
-					
+					// não irá acontecer
 					break;
 				case 6:
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							synchronized (myOutputStream) {
-								send(indexF, beginF, lengthF);
-							}
-						}
-					}).start();
+					send(index, begin, length);
 					break;
 				case 7:
-					byte piece[] = new byte[lengthF];
+					byte piece[] = new byte[length];
 					mySocketInput.read(piece);
-					final byte pieceF[] = piece;
-					new Thread(new Runnable() {
-						
-						@Override
-						public void run() {
-							write(indexF, beginF, lengthF, pieceF);
-						}
-					}).start();
+					write(index, begin, length, piece);
 					break;
 				case 8:
-
 					break;
-
 				default:
 					break;	
 				}
@@ -305,6 +321,61 @@ public class PairedConnection implements Runnable {
 				break;
 			}
 		}
+	}
+	
+	public static class Message {
+		byte id;
+		int index;
+		int begin;
+		int length;
+	}
+	
+	/**
+	 * Realiza a copia dos bytes de um array de bytes para um buffer de dados em um 
+	 * determinado índice.
+	 * @param data
+	 * @param val
+	 * @param index
+	 * @return
+	 */
+	public static int copyArray(byte data[], byte dataCp[], int index) {
+		int n = dataCp.length;
+		for (int i = 0; i < n; i++) {
+			data[index + i] = dataCp[i];
+		}
+		return index + n;
+	}
+	
+	/**
+	 * Realiza a copia dos bytes de um array de bytes para um buffer de dados em um 
+	 * determinado índice.
+	 * @param data
+	 * @param val
+	 * @param index
+	 * @return
+	 */
+	public static int copyArray(byte data[], byte dataCp[], int index, int length) {
+		for (int i = 0; i < length; i++) {
+			data[index + i] = dataCp[i];
+		}
+		return index + length;
+	}
+	
+	/**
+	 * Realiza a copia dos bytes de um inteiro para um buffer de dados em um 
+	 * determinado índice.
+	 * @param data
+	 * @param val
+	 * @param index
+	 * @return
+	 */
+	public static int copyArray(byte data[], int val, int index) {
+		byte dataCp[] = BigInteger.valueOf(val).toByteArray();
+		int n = dataCp.length;
+		for (int i = 0; i < 4 - n; i++) {
+			data[index++] = 0;
+		}
+		return copyArray(data, dataCp, index);
 	}
 
 }

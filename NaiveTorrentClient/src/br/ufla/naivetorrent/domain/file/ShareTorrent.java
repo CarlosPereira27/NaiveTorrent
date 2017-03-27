@@ -5,120 +5,242 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.CopyOnWriteArraySet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 
 import br.ufla.naivetorrent.connection.ManagerConnections;
+import br.ufla.naivetorrent.connection.PeerSocketListener;
 import br.ufla.naivetorrent.domain.peer.Peer;
+import br.ufla.naivetorrent.domain.tracker.Tracker;
 import br.ufla.naivetorrent.peer.protocol.DownloadStrategy;
+import br.ufla.naivetorrent.peer.protocol.HandshakeHandler;
 import br.ufla.naivetorrent.util.UtilByteString;
 
 public class ShareTorrent {
 	
-	public static final int MAX_DOWNLOADING = 8;
+	public static final int MAX_DOWNLOADING = 15;
+	public static final int MAX_CONNECTIONS = 15;
 	
 	class SimpleManagerConnection implements Runnable {
 
 		@Override
 		public void run() {
-			while (true) {
+			while (!isPause() && !isSeeder()) {
+				if (peersConnected.size() < MAX_CONNECTIONS && !peers.isEmpty()) {
+					new Thread(new HandshakeHandler(me, nextPeer(), 
+							ShareTorrent.this, peerSocketListener)).start();
+				}
 			}
 			
 		}
 		
 	}
 	
-	@SuppressWarnings("unused")
+	class SimpleManagerDownload implements Runnable {
+
+		@Override
+		public void run() {
+			while (!isPause() && !isSeeder()) {
+				if (nextDownloadPieces.size() < DownloadStrategy.NUM_PIECES) {
+					getMoreRarestPieces();
+				}
+				if (!nextDownloadPieces.isEmpty() && 
+						onDonwloading.size() < MAX_DOWNLOADING) {
+					int pieceIndex = getNextPiece();
+					onDonwloading.add(pieceIndex);
+					Peer peer = getPeerHave(pieceIndex);
+					managerConnections.downloadingPiece(pieceIndex, peer);
+				}
+				try {
+					Thread.sleep(100);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+			}
+			
+		}
+		
+	}
+	
+	public Peer getPeerHave(int pieceIndex) {
+		List<Peer> peersHave = new ArrayList<>();
+		for (Peer peer : peersConnected) {
+			peersHave.add(peer);
+		}
+		int index = random.nextInt(peersHave.size());
+		return peersHave.get(index);
+	}
+	
+	public int getNextPiece() {
+		return nextDownloadPieces.remove(0);
+	}
+	
+	public Peer nextPeer() {
+		Iterator<Peer> it = peers.iterator();
+		Peer peer = it.next();
+		it.remove();
+		return peer;
+	}
+	
+	private PeerSocketListener peerSocketListener;
 	private ManagerConnections managerConnections;
 	private Peer me;
 	private DownloadStrategy downloadStrategy;
 	private List<Integer> nextDownloadPieces;
 	private List<Integer> onDonwloading;
-	private ConcurrentMap<MetaFileTorrent, Boolean> fileIsCompleted;
-	private ConcurrentMap<MetaFileTorrent, FileLimits> fileToLimits;
-	private ConcurrentMap<ByteBuffer, Peer> idToPeersUndefined;
+	private Map<MetaFileTorrent, Boolean> fileIsCompleted;
+	private Map<MetaFileTorrent, FileLimits> fileToLimits;
 	private ConcurrentMap<ByteBuffer, Peer> idToPeers;
-	private ConcurrentMap<ByteBuffer, Peer> idToPeersConnected;
+	private Set<Peer> peers;
+	private Set<Peer> peersConnected;
 	private ConcurrentMap<Peer, BitSet> peerToBitfield;
-	private AtomicInteger uploaded;
-	private AtomicInteger downloaded;
+	private AtomicLong uploaded;
+	private AtomicLong downloaded;
+	private AtomicLong left;
 	private MetaTorrent metaTorrent;
 	private BitSet myBitfield;
+	private BitSet myBitfieldNextDownloading;
 	private Date lastActivity;
 	private File sharePath;
-	private boolean pause;
-	private boolean seeder;
-	
-	public void getMoreRarestPieces() {
-		synchronized (nextDownloadPieces) {
-			nextDownloadPieces.addAll(downloadStrategy.getPieces());
-		}
-	}
-	
+	private AtomicBoolean pause;
+	private AtomicBoolean seeder;
+	private Random random = new Random();
 	
 	public ShareTorrent() {
-		fileToLimits = new ConcurrentHashMap<>();
-		List<MetaFileTorrent> metaFiles = new ArrayList<>();
+		downloadStrategy = new DownloadStrategy(this);
+		nextDownloadPieces = new CopyOnWriteArrayList<>();
+		onDonwloading = new CopyOnWriteArrayList<>();
+		fileIsCompleted = new HashMap<>();
+		fileToLimits = new HashMap<>();
+		idToPeers = new ConcurrentHashMap<>();
+		peers = new CopyOnWriteArraySet<>();
+		peersConnected = new CopyOnWriteArraySet<>();
+		peerToBitfield = new ConcurrentHashMap<>();
+		uploaded = new AtomicLong();
+		downloaded = new AtomicLong();
+		left = new AtomicLong();
+	}
+	
+	private void setMetaFileData() {
+		List<MetaFileTorrent> metaFiles = metaTorrent.getInfo().getMetaFiles();
 		long limit = 0;
 		for (MetaFileTorrent metaFile : metaFiles) {
 			fileToLimits.put(metaFile, 
 					new FileLimits(limit, limit + metaFile.getLength()));
+			fileIsCompleted.put(metaFile, false);
 			limit += metaFile.getLength();
 		}
 	}
 	
+	public BitSet getMyBitfieldWithNext() {
+		BitSet myBitfieldCp;
+		synchronized (myBitfield) {
+			myBitfieldCp = (BitSet) myBitfield.clone();
+		}
+		synchronized (myBitfieldNextDownloading) {
+			myBitfieldCp.or(myBitfieldNextDownloading);
+		}
+		return myBitfieldCp;
+	}
+	
+	public void getMoreRarestPieces() {
+		nextDownloadPieces.addAll(downloadStrategy.getPieces());
+	}
+	
+	public void putPeerBitfield(Peer peer, BitSet bitfield) {
+		peerToBitfield.put(peer, bitfield);
+	}
+	
+	
+	public Peer connectedPeer(ByteBuffer peerId) {
+		Peer peer = idToPeers.get(peerId);
+		if (peer == null) {
+			peer = new Peer();
+			peer.setId(peerId);
+			peersConnected.add(peer);
+		} else {
+			peers.remove(peer);
+			peersConnected.add(peer);
+		}
+		return peer;
+	}
+	
 	public void disconectedPeer(Peer peer) {
-		synchronized (idToPeersUndefined) {
-			idToPeersUndefined.remove(peer.getId());
-		}
-		synchronized (idToPeers) {
-			idToPeers.remove(peer.getId());
-		}
-		synchronized (idToPeersConnected) {
-			idToPeersConnected.remove(peer.getId());
-		}
-		synchronized (peerToBitfield) {
-			peerToBitfield.remove(peer);
-		}
+		peers.remove(peer);
+		peersConnected.remove(peer);
+		peerToBitfield.remove(peer);
 	}
 	
 	public void definiedPeer(Peer peer) {
-		synchronized (idToPeersUndefined) {
-			idToPeersUndefined.remove(peer.getId());
-		}
-		synchronized (idToPeersConnected) {
-			idToPeersConnected.put(peer.getId(), peer);
-		}
+		peersConnected.add(peer);
 	}
 	
-	public void putPeerUndefinied(Peer peer) {
-		synchronized (idToPeersUndefined) {
-			idToPeersUndefined.put(peer.getId(), peer);
-		}
-	}
-	
-	public void putPeerConnected(Peer peer) {
-		synchronized (idToPeersConnected) {
-			idToPeersConnected.put(peer.getId(), peer);
-		}
+	public void connectedPeer(Peer peer) {
+		peersConnected.add(peer);
 	}
 	
 	public void backToDownload(Integer index) {
-		synchronized (onDonwloading) {
-			onDonwloading.remove(index);
+		onDonwloading.remove(index);
+		nextDownloadPieces.add(index);
+	}
+	
+	public void setMetaFileCompleted(MetaFileTorrent metaFile) {
+		String pathFile = sharePath.getPath() + metaFile.getPathFile() + ".part";
+		String newPathFile = sharePath.getPath() + metaFile.getPathFile();
+		File file = new File(pathFile);
+		file.renameTo(new File(newPathFile));
+		fileIsCompleted.put(metaFile, true);
+	}
+	
+	public void verifyFileCompleted(MetaFileTorrent metaFile, FileLimits fileLimits) {
+		long pieceLength = getPiecesLength();
+		int indexMin = (int) (fileLimits.limitInf / pieceLength);
+		int indexMax = (int) (fileLimits.limitSup / pieceLength);
+		synchronized (myBitfield) {
+			for (int i = indexMin; i <= indexMax; i++) {
+				if (!myBitfield.get(i)) {
+					return;
+				}
+			}
 		}
-		synchronized (nextDownloadPieces) {
-			nextDownloadPieces.add(index);
+		setMetaFileCompleted(metaFile);
+
+	}
+	
+	public void verifyFileCompleted(int index) {
+		long pointerIndex = index * getPiecesLength();
+		long nextPointerIndex = pointerIndex + getPiecesLength();
+		for (Map.Entry<MetaFileTorrent, FileLimits> entry : fileToLimits.entrySet()) {
+			FileLimits fileLimits = entry.getValue();
+			if (fileLimits.limitSup > pointerIndex 
+					&& fileLimits.limitSup < nextPointerIndex) {
+				verifyFileCompleted(entry.getKey(), fileLimits);
+			} else if (entry.getValue().limitInf > pointerIndex
+					&& fileLimits.limitSup < nextPointerIndex) {
+				verifyFileCompleted(entry.getKey(), fileLimits);
+			} else if (entry.getValue().limitInf > nextPointerIndex) {
+				return;
+			}
 		}
 	}
 	
 	public void setMyBitfieldPiece(int index) {
+		onDonwloading.remove(new Integer(index));
 		synchronized (myBitfield) {
 			myBitfield.set(index);
 		}
+		managerConnections.multicastHave(index);
+		verifyFileCompleted(index);
 	}
 	
 
@@ -137,8 +259,9 @@ public class ShareTorrent {
 	}
 
 	public void setPeerBitfield(Peer peer, int index) {
-		synchronized (peerToBitfield) {
-			peerToBitfield.get(peer).set(index);
+		BitSet peerBitfield = peerToBitfield.get(peer);
+		synchronized (peerBitfield) {
+			peerBitfield.set(index);
 		}
 	}
 	
@@ -163,7 +286,7 @@ public class ShareTorrent {
 	 * @return número de pares do torrent
 	 */
 	public int getNumPeers() {
-		return idToPeers.size();
+		return peers.size();
 	}
 	
 	/**
@@ -171,7 +294,7 @@ public class ShareTorrent {
 	 * @return número de pares conectados do torrent
 	 */
 	public int getNumPeersConnected() {
-		return idToPeersConnected.size();
+		return peersConnected.size();
 	}
 	
 	/**
@@ -185,7 +308,8 @@ public class ShareTorrent {
 	
 	public void setMyBitfieldString(String myBitfieldString) {
 		if (myBitfieldString != null) {
-			
+			myBitfield = BitSet.valueOf(UtilByteString
+					.stringToBytes(myBitfieldString));
 		}
 	}
 	
@@ -230,21 +354,34 @@ public class ShareTorrent {
 	public Peer getMe() {
 		return me;
 	}
-	public Map<ByteBuffer, Peer> getIdToPeers() {
-		return idToPeers;
+	public Set<Peer> getPeers() {
+		return peers;
 	}
-	public Map<ByteBuffer, Peer> getIdToPeersConnected() {
-		return idToPeersConnected;
+	public Set<Peer> getPeersConnected() {
+		return peersConnected;
 	}
 	public Map<Peer, BitSet> getIdToBitfield() {
 		return peerToBitfield;
 	}
-	public int getUploaded() {
+	public long getUploaded() {
 		return uploaded.get();
 	}
-	public int getDownloaded() {
+	public long getDownloaded() {
 		return downloaded.get();
 	}
+	public long getLeft() {
+		return left.get();
+	}
+	public String getInfoHashHex() {
+		return metaTorrent.getInfoHashHex();
+	}
+
+
+	public List<Tracker> getTrackers() {
+		return metaTorrent.getTrackers();
+	}
+
+
 	public MetaTorrent getMetaTorrent() {
 		return metaTorrent;
 	}
@@ -277,23 +414,27 @@ public class ShareTorrent {
 	public void setMe(Peer me) {
 		this.me = me;
 	}
-	public void setIdToPeers(ConcurrentMap<ByteBuffer, Peer> idToPeers) {
-		this.idToPeers = idToPeers;
+	public void setPeers(Set<Peer> peers) {
+		this.peers = peers;
 	}
-	public void setIdToPeersConnected(ConcurrentMap<ByteBuffer, Peer> idToPeersConnected) {
-		this.idToPeersConnected = idToPeersConnected;
+	public void setPeersConnected(Set<Peer> peersConnected) {
+		this.peersConnected = peersConnected;
 	}
 	public void setIdToBitfield(ConcurrentMap<Peer, BitSet> idToBitfield) {
 		this.peerToBitfield = idToBitfield;
 	}
-	public void setUploaded(int uploaded) {
+	public void setUploaded(long uploaded) {
 		this.uploaded.set(uploaded);
 	}
-	public void setDownloaded(int downloaded) {
+	public void setDownloaded(long downloaded) {
 		this.downloaded.set(downloaded);
+	}
+	public void setLeft(long left) {
+		this.left.set(left);
 	}
 	public void setMetaTorrent(MetaTorrent metaTorrent) {
 		this.metaTorrent = metaTorrent;
+		setMetaFileData();
 	}
 	public void setMyBitfield(BitSet myBitfield) {
 		this.myBitfield = myBitfield;
@@ -305,27 +446,22 @@ public class ShareTorrent {
 		this.sharePath = sharePath;
 	}
 	public boolean isPause() {
-		return pause;
+		return pause.get();
 	}
 	public void setPause(boolean pause) {
-		this.pause = pause;
+		this.pause.set(pause);
 	}
 
 	public boolean isSeeder() {
-		return seeder;
+		return seeder.get();
 	}
 
 	public void setSeeder(boolean seeder) {
-		this.seeder = seeder;
+		this.seeder.set(seeder);
 	}
 
-	public Map<ByteBuffer, Peer> getIdToPeersUndefined() {
-		return idToPeersUndefined;
-	}
 
-	public void setIdToPeersUndefined(ConcurrentMap<ByteBuffer, Peer> idToPeersUndefined) {
-		this.idToPeersUndefined = idToPeersUndefined;
-	}
+
 	
 
 }

@@ -3,14 +3,21 @@ package br.ufla.naivetorrent.domain.tracker;
 import java.io.Serializable;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import br.ufla.naivetorrent.util.UtilHex;
 
-public class Tracker implements Serializable {
+public class Tracker implements Serializable, Comparable<Tracker> {
 	
 	private static final long serialVersionUID = 1L;
+	public static final int MIN_INTERVAL = 60;
 	private ByteBuffer id;
 	private InetSocketAddress addressListening;
+	private AtomicInteger interval;
+	
+	public Tracker() {
+		interval = new AtomicInteger(MIN_INTERVAL);
+	}
 	
 	/**
 	 * Recupera o endereço do tracker.
@@ -76,6 +83,13 @@ public class Tracker implements Serializable {
 	public void setAddressListening(InetSocketAddress addressListening) {
 		this.addressListening = addressListening;
 	}
+	public int getInterval() {
+		return interval.get();
+	}
+
+	public void setInterval(int interval) {
+		this.interval.set(interval);
+	}
 	
 	
 	// HASHCODE e EQUALS
@@ -115,6 +129,13 @@ public class Tracker implements Serializable {
 	public String toString() {
 		return "Tracker [id=" + id + ", socketAddressListening=" + addressListening + "]";
 	}
+
+	@Override
+	public int compareTo(Tracker o) {
+		return interval.get() - o.interval.get();
+	}
+
+
 	
 
 }

@@ -10,9 +10,12 @@ import java.util.Random;
 
 import org.junit.Test;
 
+import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.tracker.Tracker;
 import br.ufla.naivetorrent.tracker.protocol.RequestMessage;
 import br.ufla.naivetorrent.tracker.request.HttpRequest;
+import br.ufla.naivetorrent.tracker.request.ManagerRequest;
+import br.ufla.naivetorrent.tracker.request.ManagerTorrentRequest;
 
 public class TestHttpRequest {
 
@@ -68,7 +71,8 @@ public class TestHttpRequest {
 //				ByteBuffer.wrap(messageDigestMD5.digest())));
 		Tracker tracker = new Tracker();
 		tracker.setAddressListening(new InetSocketAddress("192.168.1.107", 8084));
-		HttpRequest httpRequest = new HttpRequest(tracker, message);
+		HttpRequest httpRequest = new HttpRequest(tracker, message, 
+				new ManagerTorrentRequest(new ShareTorrent(), new ManagerRequest()));
 		System.out.println("###");
 		httpRequest.sendRequest();
 		

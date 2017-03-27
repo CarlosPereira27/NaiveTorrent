@@ -17,6 +17,7 @@ public class MetaTorrentContract {
             encoding TEXT,
             uploaded INTEGER NOT NULL,
             downloaded INTEGER NOT NULL,
+            left INTEGER NOT NULL,
             bitfield TEXT NOT NULL,
             lastActivity INTEGER NOT NULL,
             sharePath TEXT NOT NULL );"
@@ -32,6 +33,7 @@ public class MetaTorrentContract {
             + Columns.ENCODING + " TEXT, "
             + Columns.UPLOADED + " INTEGER NOT NULL, "
             + Columns.DOWNLOADED + " INTEGER NOT NULL, "
+            + Columns.LEFT + " INTEGER NOT NULL, "
             + Columns.BITFIELD + " TEXT NOT NULL, "
             + Columns.LAST_ACTIVITY + " INTEGER NOT NULL, "
             + Columns.SHARE_PATH + " TEXT NOT NULL );";
@@ -45,6 +47,7 @@ public class MetaTorrentContract {
         public static final String ENCODING = "encoding";
         public static final String UPLOADED = "uploaded";
         public static final String DOWNLOADED = "downloaded";
+        public static final String LEFT = "downloaded";
         public static final String BITFIELD = "bitfield";
         public static final String LAST_ACTIVITY = "lastActivity";
         public static final String SHARE_PATH = "sharePath";

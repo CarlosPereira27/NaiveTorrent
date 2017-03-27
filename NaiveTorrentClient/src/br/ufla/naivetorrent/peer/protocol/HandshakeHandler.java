@@ -4,12 +4,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.math.BigInteger;
-import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.BitSet;
 
 import br.ufla.naivetorrent.connection.PairedConnection;
+import br.ufla.naivetorrent.connection.PeerSocketListener;
 import br.ufla.naivetorrent.domain.file.ShareTorrent;
 import br.ufla.naivetorrent.domain.peer.Peer;
 
@@ -17,16 +17,15 @@ public class HandshakeHandler implements Runnable {
 	
 	private Peer me;
 	private Peer peer;
-	private InetSocketAddress socketAddress;
 	private ShareTorrent shareTorrent;
+	private PeerSocketListener peerSocketListener;
 	
 	public HandshakeHandler(Peer me, Peer peer, 
-			InetSocketAddress socketAddress, 
-			ShareTorrent shareTorrent) {
+			ShareTorrent shareTorrent, PeerSocketListener peerSocketListener) {
 		this.me = me;
 		this.peer = peer;
-		this.socketAddress = socketAddress;
 		this.shareTorrent = shareTorrent;
+		this.peerSocketListener = peerSocketListener;
 	}
 	
 	private HandshakeHandler() {
@@ -35,13 +34,14 @@ public class HandshakeHandler implements Runnable {
 
 	public void sendHandshakeMessage() 
 			throws UnknownHostException, IOException {
-		Socket socket = new Socket(peer.getSocketAddressListening().getAddress(), 
-				peer.getSocketAddressListening().getPort());
+		Socket socket = new Socket(peer.getIpOrHostName(), 
+				peer.getPort());
 		OutputStream out = socket.getOutputStream();
 		out.write(new HandshakeMessage(shareTorrent
 				.getMetaTorrent().getInfoHash(), 
 				me.getId()).toByteArray());
 		out.flush();
+		// read bitfield message
 		BitSet myBitfield = shareTorrent.getMyBitfield();
 		byte myBitfieldBytes[] =  myBitfield.toByteArray();
 		int length = myBitfieldBytes.length;
@@ -69,18 +69,24 @@ public class HandshakeHandler implements Runnable {
 			in.close();
 			out.close();
 			socket.close();
-		} else {
-			byte data[] = new byte[length + 5];
-			int index = 0;
-			index += PairedConnection.copyArray(data, length + 1, index);
-			data[index++] = 5;
-			index = PairedConnection.copyArray(data, shareTorrent
-					.getMyBitfield().toByteArray(), index);
-			out.write(data);
-			out.flush();
-			// abre conexão
-			new Thread(new PairedConnection(shareTorrent, peer, socket)).start();
-		}
+			return;
+		} 
+		// send my bitfield
+		byte data[] = new byte[length + 5];
+		int index = 0;
+		index += PairedConnection.copyArray(data, length + 1, index);
+		data[index++] = 5;
+		index = PairedConnection.copyArray(data, shareTorrent
+				.getMyBitfield().toByteArray(), index);
+		out.write(data);
+		out.flush();
+		// abre conexão
+		shareTorrent.connectedPeer(peer);
+		shareTorrent.putPeerBitfield(peer, BitSet.valueOf(bitfield));
+		PairedConnection newConnection = new PairedConnection(shareTorrent, peer, socket);
+		peerSocketListener.putConnection(shareTorrent.getMetaTorrent().getInfoHash(),
+				newConnection);
+		new Thread(newConnection).start();
 	}
 
 	@Override
@@ -102,14 +108,11 @@ public class HandshakeHandler implements Runnable {
 	private void setPeer(Peer peer) {
 		this.peer = peer;
 	}
-	private void setSocketAddress(InetSocketAddress socketAddress) {
-		this.socketAddress = socketAddress;
-	}
 	private void setShareTorrent(ShareTorrent shareTorrent) {
 		this.shareTorrent = shareTorrent;
 	}
 	private boolean isReadyToBuild() {
-		return peer != null && socketAddress != null && shareTorrent != null;
+		return peer != null  && shareTorrent != null;
 	}
 
 
@@ -143,16 +146,6 @@ public class HandshakeHandler implements Runnable {
 		 */
 		public Builder withPeer(Peer peer) {
 			handshakeHandler.setPeer(peer);
-			return this;
-		}
-		
-		/**
-		 * Define o endereço do socket usado para realizar o handshake.
-		 * @param metaTorrent  endereço do socket
-		 * @return próprio builder
-		 */
-		public Builder withSocketAddress(InetSocketAddress socketAddress) {
-			handshakeHandler.setSocketAddress(socketAddress);
 			return this;
 		}
 		

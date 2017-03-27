@@ -32,16 +32,18 @@ public class DaoUpdateShareTorrent {
 					"UPDATE " + MetaTorrentContract.TABLE_NAME 
 					+ "\nSET " + MetaTorrentContract.Columns.BITFIELD + " = ?, " 
 					+ MetaTorrentContract.Columns.DOWNLOADED + " = ?, " 
+					+ MetaTorrentContract.Columns.LEFT + " = ?, "
 					+ MetaTorrentContract.Columns.LAST_ACTIVITY + " = ?, "
 					+ MetaTorrentContract.Columns.SHARE_PATH + " = ?, " 
 					+ MetaTorrentContract.Columns.UPLOADED + " = ?\n" 
 					+ "WHERE " + MetaTorrentContract.Columns.ID + " = ?");
 			ps.setString(1, shareTorrent.getMyBitfieldString());
-			ps.setInt(2, shareTorrent.getDownloaded());
-			ps.setLong(3, shareTorrent.getLastActivityTime());
-			ps.setString(4, shareTorrent.getSharePathString());
-			ps.setInt(5, shareTorrent.getUploaded());
-			ps.setInt(6, idTorrent);
+			ps.setLong(2, shareTorrent.getDownloaded());
+			ps.setLong(3, shareTorrent.getLeft());
+			ps.setLong(4, shareTorrent.getLastActivityTime());
+			ps.setString(5, shareTorrent.getSharePathString());
+			ps.setLong(6, shareTorrent.getUploaded());
+			ps.setInt(7, idTorrent);
 			return ps.execute();
 		} catch (SQLException e) {
 			System.err.println(e.getMessage());

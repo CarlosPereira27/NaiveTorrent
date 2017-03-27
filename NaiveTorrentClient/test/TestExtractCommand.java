@@ -1,6 +1,7 @@
 import static org.junit.Assert.*;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -16,6 +17,19 @@ public class TestExtractCommand {
 		File file = new File(str);
 		System.out.println(file.getPath());
 		System.out.println(file.exists());
+		
+	}
+	
+	@Test
+	public void test3() {
+		List<Integer> list = new ArrayList<>();
+		list.add(10);
+		list.add(20);
+		list.add(3);
+		list.add(2);
+		Integer i = 20;
+		list.remove(i);
+		System.out.println(Arrays.toString(list.toArray()));
 		
 	}
 	

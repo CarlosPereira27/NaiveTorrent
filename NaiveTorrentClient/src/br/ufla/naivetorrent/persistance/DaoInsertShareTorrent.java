@@ -85,24 +85,26 @@ public class DaoInsertShareTorrent {
 					+ MetaTorrentContract.Columns.CREATED_BY + ", " 
 					+ MetaTorrentContract.Columns.CREATION_DATE + ", "
 					+ MetaTorrentContract.Columns.DOWNLOADED + ", " 
+					+ MetaTorrentContract.Columns.LEFT + ", " 
 					+ MetaTorrentContract.Columns.ENCODING + ", "
 					+ MetaTorrentContract.Columns.INFO_HASH + ", " 
 					+ MetaTorrentContract.Columns.LAST_ACTIVITY + ", "
 					+ MetaTorrentContract.Columns.SHARE_PATH + ", " 
 					+ MetaTorrentContract.Columns.UPLOADED + ")\n"
-					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", 
+					+ "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);", 
 					Statement.RETURN_GENERATED_KEYS);
 			ps.setString(1, shareTorrent.getMyBitfieldString());
 			MetaTorrent metaTorrent = shareTorrent.getMetaTorrent();
 			ps.setString(2, metaTorrent.getComment());
 			ps.setString(3, metaTorrent.getCreatedBy());
 			ps.setLong(4, metaTorrent.getCreationDateTime());
-			ps.setInt(5, shareTorrent.getDownloaded());
-			ps.setString(6, metaTorrent.getEncoding());
-			ps.setString(7, metaTorrent.getInfoHashHex());
-			ps.setLong(8, shareTorrent.getLastActivityTime());
-			ps.setString(9, shareTorrent.getSharePathString());
-			ps.setInt(10, shareTorrent.getUploaded());
+			ps.setLong(5, shareTorrent.getDownloaded());
+			ps.setLong(6, shareTorrent.getLeft());
+			ps.setString(7, metaTorrent.getEncoding());
+			ps.setString(8, metaTorrent.getInfoHashHex());
+			ps.setLong(9, shareTorrent.getLastActivityTime());
+			ps.setString(10, shareTorrent.getSharePathString());
+			ps.setLong(11, shareTorrent.getUploaded());
 			ps.execute();
 			rs = ps.getGeneratedKeys();
 			if (rs.next())

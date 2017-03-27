@@ -20,6 +20,7 @@ public class TestNetworkInterface {
 			    while (ee.hasMoreElements()) {
 			        InetAddress i = ee.nextElement();
 			        System.out.println(i.getHostAddress());
+			        System.out.println(i.getClass());
 			        System.out.println(getType(i));
 			    }
 			}
